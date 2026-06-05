@@ -1,0 +1,3 @@
+model,samples,top1_percent,mean_class_accuracy_percent
+C1f_ptq_int8,14787,87.022385,86.255278
+C1j_ptq_int8,14787,86.488131,85.734895

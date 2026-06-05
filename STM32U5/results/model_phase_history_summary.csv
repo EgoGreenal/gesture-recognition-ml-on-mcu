@@ -1,0 +1,14 @@
+model_id,display,arch,phase,epochs,best_epoch,best_top1,last_train_loss,last_val_top1,duration_s,source
+student_V0,V0 from-scratch tiny-CNN+TSM,tiny_cnn_tsm,fp32_kd_train,30,29,15.06,17.0268,,3723.0,student_v2_41422954_0.out
+student_V1,V1 from-scratch tiny-CNN+TSM,tiny_cnn_tsm,fp32_kd_train,30,26,17.92,16.6466,,3935.3,student_v2_41422954_1.out
+student_V2,V2 from-scratch tiny-CNN+TSM,tiny_cnn_tsm,fp32_kd_train,30,29,20.76,15.9674,,4140.4,student_v2_41422954_2.out
+student_V3,V3 from-scratch tiny-CNN+TSM,tiny_cnn_tsm,fp32_kd_train,30,26,22.03,15.2161,,4415.2,student_v2_41422954_3.out
+student_V4,V4 from-scratch tiny-CNN+TSM,tiny_cnn_tsm,fp32_kd_train,30,29,38.45,11.0183,,3958.6,student_v2_41422954_4.out
+student_V5,V5 from-scratch tiny-CNN+TSM,tiny_cnn_tsm,fp32_kd_train,30,29,25.12,14.5707,,3562.0,student_v2_41422954_5.out
+student_V6,V6 from-scratch tiny-CNN+TSM,tiny_cnn_tsm,fp32_kd_train,30,29,16.0,16.9158,,3548.2,student_v2_41422954_6.out
+student_C1f,C1f TSM-MBV2 truncated (C1),tsm_mbv2_trunc,fp32_kd_train,30,29,87.35,2.3634,,4059.6,c1deep_41478885_2.out
+student_C1f,C1f TSM-MBV2 truncated (C1),tsm_mbv2_trunc,int8_ptq,,,87.022,,87.022,,eval_int8_C1f_ptq.json
+student_C1j,C1j TSM-MBV2 truncated (C1),tsm_mbv2_trunc,fp32_kd_train,60,59,86.65,2.3373,,10744.2,c1deep_41478885_6.out
+student_C1j,C1j TSM-MBV2 truncated (C1),tsm_mbv2_trunc,int8_ptq,,,86.488,,86.488,,eval_int8_C1j_ptq.json
+student_C1n,C1n TSM-MBV2 truncated (C1),tsm_mbv2_trunc,fp32_kd_train,30,29,86.71,2.2198,,4639.8,c1deep2_41495944_2.out
+student_C1o,C1o TSM-MBV2 truncated (C1),tsm_mbv2_trunc,fp32_kd_train,30,29,87.17,2.2546,,4254.6,c1deep2_41495944_3.out
