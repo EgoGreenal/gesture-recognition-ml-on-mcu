@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Build outputs
+build/
+out/
+dist/
+*.elf
+*.bin
+*.hex
+*.srec
+*.map
+*.dasm
+*.o
+*.obj
+*.d
+
+# Large ML artifacts
+*.pth
+*.pth.tar
+*.pt
+*.onnx
+*.h5
+*.npy
+*.npz
+
+# Datasets and caches
+data/
+dataset/
+datasets/
+cache/
+runs/
+runtime/
+outputs/
+
+# External dependencies
+msdk/
+ai8x-training/
+ai8x-synthesis/
+MaximSDK/
+
+# Local logs and OS/editor noise
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temporary files
+_tmp/
+tmp/
+*.tmp

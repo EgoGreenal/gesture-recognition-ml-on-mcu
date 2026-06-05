@@ -1,0 +1,50 @@
+{
+  "package_created": "2026-06-01",
+  "selection": "best_deployable",
+  "model_id": "ai8x_jestermotion12res_signed_huge_teacher_distill_20260530_223904",
+  "display_name": "Huge-teacher distilled signed residual student",
+  "architecture": "jestermotion12res",
+  "input": {
+    "frames": 12,
+    "representation": "signed_motion_grayscale",
+    "height": 64,
+    "width": 64
+  },
+  "classes": 27,
+  "parameters": 393088,
+  "mmac": 54.431968,
+  "validation": {
+    "pre_qat_distilled_best": {
+      "top1_percent": 77.757,
+      "top5_percent": 95.476,
+      "epoch": 8,
+      "file": "weights/pre_quant_student_distilled_best.pth.tar"
+    },
+    "qat_best": {
+      "top1_percent": 76.682,
+      "top5_percent": 95.942,
+      "epoch": 15,
+      "file": "weights/post_quant_qat_best.pth.tar"
+    }
+  },
+  "deployment": {
+    "target": "MAX78000",
+    "deployable_status": "selected_best_deployable",
+    "cnn_time_ms_reference": 4.701,
+    "note": "Topology was treated as the stable deployable target; use the QAT best checkpoint for synthesis/deployment."
+  },
+  "source_paths": {
+    "run_dir": "/path/to/20bn-jester/runs/ai8x_jestermotion12res_signed_huge_teacher_distill_20260530_223904",
+    "model_definition": "/path/to/20bn-jester/ai8x-training/models/jestermotion12res.py",
+    "qat_policy": "/path/to/20bn-jester/ai8x-training/policies/qat_policy_jestermotion12res.yaml"
+  },
+  "files": {
+    "pre_quant_weights": "weights/pre_quant_student_distilled_best.pth.tar",
+    "post_quant_weights": "weights/post_quant_qat_best.pth.tar",
+    "post_quant_checkpoint": "weights/post_quant_qat_checkpoint.pth.tar",
+    "model_definition": "model_definition/jestermotion12res.py",
+    "qat_policy": "model_definition/qat_policy_jestermotion12res.yaml",
+    "train_log": "logs/train.log",
+    "qat_log": "logs/qat.log"
+  }
+}

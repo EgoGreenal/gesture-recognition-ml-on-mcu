@@ -1,0 +1,12 @@
+{
+  "command": "cache",
+  "dataset_root": "/path/to/20bn-jester-v1-complete",
+  "annotations_dir": "/path/to/20bn-jester/annotations",
+  "cache_dir": "/path/to/20bn-jester/cache/jester_cache_signedmotion12_64_full",
+  "frames": 12,
+  "image_size": 64,
+  "encoding": "signed_motion",
+  "train_samples": 0,
+  "val_samples": 0,
+  "seed": 42
+}

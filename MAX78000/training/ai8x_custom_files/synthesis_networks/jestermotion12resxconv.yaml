@@ -1,0 +1,140 @@
+---
+# 12-plane signed-motion residual gesture-recognition network for MAX78000.
+
+arch: jestermotion12resxconv
+dataset: jester_signedmotion12
+
+layers:
+  # Input is HWC, 64x64, 12 channels:
+  # channel 0 is the center grayscale frame, channels 1-11 are signed adjacent-frame differences.
+  - pad: 1
+    activate: ReLU
+    out_offset: 0x4000
+    processors: 0x0000.0000.0000.0fff
+    data_format: HWC
+    operation: Conv2d
+    kernel_size: 3x3
+
+  - pad: 1
+    max_pool: 2
+    pool_stride: 2
+    activate: ReLU
+    out_offset: 0x0000
+    processors: 0x0000.0000.00ff.ffff
+    operation: Conv2d
+    kernel_size: 3x3
+
+  - pad: 1
+    max_pool: 2
+    pool_stride: 2
+    activate: ReLU
+    out_offset: 0x2000
+    processors: 0x0000.ffff.ffff.ffff
+    operation: Conv2d
+    kernel_size: 3x3
+    name: l2
+
+  # Residual block 1 at 16x16x64.
+  - in_sequences: l2
+    in_offset: 0x2000
+    out_offset: 0x4000
+    processors: 0xffff.ffff.ffff.ffff
+    output_processors: 0xffff.ffff.ffff.ffff
+    operation: Passthrough
+    write_gap: 1
+    name: res1_skip
+
+  - in_sequences: l2
+    in_offset: 0x2000
+    pad: 1
+    activate: ReLU
+    out_offset: 0x0000
+    processors: 0xffff.ffff.ffff.ffff
+    operation: Conv2d
+    kernel_size: 3x3
+
+  - pad: 1
+    out_offset: 0x4004
+    processors: 0xffff.ffff.ffff.ffff
+    operation: Conv2d
+    kernel_size: 3x3
+    write_gap: 1
+    activation: None
+    name: res1_main
+
+  - in_sequences: [res1_skip, res1_main]
+    in_offset: 0x4000
+    out_offset: 0x0000
+    processors: 0xffff.ffff.ffff.ffff
+    operation: None
+    eltwise: add
+
+  - pad: 1
+    max_pool: 2
+    pool_stride: 2
+    activate: ReLU
+    out_offset: 0x2000
+    processors: 0xffff.ffff.ffff.ffff
+    operation: Conv2d
+    kernel_size: 3x3
+    name: l7
+
+  # Residual block 2 at 8x8x64.
+  - in_sequences: l7
+    in_offset: 0x2000
+    out_offset: 0x4000
+    processors: 0xffff.ffff.ffff.ffff
+    output_processors: 0xffff.ffff.ffff.ffff
+    operation: Passthrough
+    write_gap: 1
+    name: res2_skip
+
+  - in_sequences: l7
+    in_offset: 0x2000
+    pad: 1
+    activate: ReLU
+    out_offset: 0x0000
+    processors: 0xffff.ffff.ffff.ffff
+    operation: Conv2d
+    kernel_size: 3x3
+
+  - pad: 1
+    out_offset: 0x4004
+    processors: 0xffff.ffff.ffff.ffff
+    operation: Conv2d
+    kernel_size: 3x3
+    write_gap: 1
+    activation: None
+    name: res2_main
+
+  - in_sequences: [res2_skip, res2_main]
+    in_offset: 0x4000
+    out_offset: 0x0000
+    processors: 0xffff.ffff.ffff.ffff
+    operation: None
+    eltwise: add
+
+  - pad: 1
+    activate: ReLU
+    out_offset: 0x2000
+    processors: 0xffff.ffff.ffff.ffff
+    operation: Conv2d
+    kernel_size: 3x3
+
+  - max_pool: 2
+    pool_stride: 2
+    out_offset: 0x0000
+    processors: 0xffff.ffff.ffff.ffff
+    operation: None
+
+  - flatten: true
+    activate: ReLU
+    out_offset: 0x2000
+    processors: 0xffff.ffff.ffff.ffff
+    output_processors: 0x00ff.ffff.ffff.ffff
+    operation: MLP
+
+  - out_offset: 0x0000
+    output_width: 32
+    processors: 0x00ff.ffff.ffff.ffff
+    operation: MLP

@@ -1,0 +1,59 @@
+---
+# 8-frame 64x64 grayscale gesture-recognition network for MAX78000.
+
+arch: jesternet
+dataset: jester
+
+layers:
+  # Input is HWC, 64x64, 8 channels. Each channel is one grayscale frame.
+  - pad: 1
+    activate: ReLU
+    out_offset: 0x4000
+    processors: 0x0000.0000.0000.00ff
+    data_format: HWC
+    operation: Conv2d
+    kernel_size: 3x3
+
+  - pad: 1
+    max_pool: 2
+    pool_stride: 2
+    activate: ReLU
+    out_offset: 0x0000
+    processors: 0x0000.0000.0000.ffff
+    operation: Conv2d
+    kernel_size: 3x3
+
+  - pad: 1
+    max_pool: 2
+    pool_stride: 2
+    activate: ReLU
+    out_offset: 0x2000
+    processors: 0x0000.0000.ffff.ffff
+    operation: Conv2d
+    kernel_size: 3x3
+
+  - pad: 1
+    max_pool: 2
+    pool_stride: 2
+    activate: ReLU
+    out_offset: 0x0000
+    processors: 0xffff.ffff.ffff.ffff
+    operation: Conv2d
+    kernel_size: 3x3
+
+  - max_pool: 2
+    pool_stride: 2
+    out_offset: 0x2000
+    processors: 0xffff.ffff.ffff.ffff
+    operation: None
+
+  - flatten: true
+    activate: ReLU
+    out_offset: 0x0000
+    processors: 0xffff.ffff.ffff.ffff
+    operation: MLP
+
+  - out_offset: 0x2000
+    output_width: 32
+    processors: 0xffff.ffff.ffff.ffff
+    operation: MLP
