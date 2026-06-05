@@ -11,7 +11,19 @@ This directory contains lightweight summary artifacts used to justify the STM32U
 - `stedgeai/`
   - ST Edge AI analysis summaries used to estimate STM32U5 deployment cost.
 - `analyze_summary.json`
-  - Per-variant architecture analysis (params, MACs, RAM/ROM, INT8 size, estimated U5 latency).
+  - Per-variant architecture analysis (params, MACs, RAM/ROM, INT8 size, **estimated**
+    U5 latency — see the measured-latency caveat below).
+- `bench_summary.csv`
+  - **On-device** benchmark of the deployed C1j streaming INT8 model (S1 @ 0.85,
+    min_exit_frame 5), extracted from `../mcu/firmware/gesture_c1j_U5_board/bench_*.json`:
+    accuracy, mean exit frame, observation ratio, measured ms/frame.
+
+> **Estimated vs measured latency.** The `latency`/`lat_per_frame_ms` fields in
+> `analyze_summary.json`, `model_training_summary.csv`, and `path_selection/` are
+> **offline X-CUBE-AI estimates** (~32–70 ms/frame). The real board measures
+> **~141 ms/frame** for C1j (`bench_summary.csv`) — the estimate under-predicted by
+> ~2–4× (effective Helium INT8 throughput ~57 MMAC/s vs the assumed ~300). Treat the
+> estimated columns as lower bounds; `bench_summary.csv` is ground truth.
 
 ## Training-history summaries
 

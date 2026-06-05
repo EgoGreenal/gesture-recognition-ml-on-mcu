@@ -91,11 +91,18 @@ C1o**. C1f/C1j were carried to quantization. FP32 best top-1 ≈ 86.6–87.4 %.
   [../docs/tsm_probe_results.md](tsm_probe_results.md)).
 
 Host INT8 evaluation (`training/core/eval_int8.py` → `../results/int8_eval/`):
-**C1f 87.02 %**, **C1j 86.49 %** top-1 on the 14,787-clip val set.
+**C1f 87.02 %**, **C1j 86.49 %** top-1 (no early exit) on the 14,787-clip val set.
 
-## 6. Early exit
+## 6. Deployment & early exit
 
-See [EARLY_EXIT.md](EARLY_EXIT.md).
+The deployed model is **C1j** (streaming INT8). A full STM32CubeIDE project lives at
+`../mcu/firmware/gesture_c1j_U5_board/` (firmware `C1j-ai-v2`): it runs the streaming
+model one frame at a time (`ai_streaming_step`) on the board, with the early-exit
+decision (S1, threshold 0.85, min_exit_frame 5) applied host-side. **Measured
+on-device latency is ~141 ms/frame** (within the 150 ms/frame budget) — note this is
+~2–4× the offline X-CUBE-AI estimate in `../results/model_training_summary.csv`. See
+[EARLY_EXIT.md](EARLY_EXIT.md) for the on-device benchmark and the
+estimated-vs-measured discussion.
 
 ## Reproducing the result summaries
 

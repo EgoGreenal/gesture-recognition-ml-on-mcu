@@ -4,8 +4,14 @@ This directory collects the STM32U5-specific deployment material for the gesture
 
 Current contents:
 
+- `mcu/firmware/gesture_c1j_U5_board/`
+  - **Full STM32CubeIDE project (firmware `C1j-ai-v2`)** that runs the deployed C1j
+    streaming INT8 model on the board (`ai_streaming_step`, single frame + TSM cache),
+    with X-CUBE-AI generated network, host driver/benchmark scripts, and on-device
+    `bench_*.json` results. This is the working on-device firmware.
 - `firmware/main.c`
-  - STM32U5 firmware entry file prepared for board-side integration and smoke-test bring-up.
+  - Earlier standalone smoke-test entry file (`C1j-smoke-v0`, board bring-up only,
+    no inference). Superseded by the CubeIDE project above; kept for reference.
 - `deploy/main_template.c`
   - Deployment-oriented `main.c` template for STM32CubeIDE / X-CUBE-AI integration.
 - `deploy/host_inference_reference.c`
@@ -29,7 +35,8 @@ Current contents:
 - `models/selected_deployable/`
   - Final chosen deployable TFLite models and generated ST Edge AI network sources.
 - `results/`
-  - Path selection, INT8 evaluation, early-exit, and ST Edge AI summary artifacts.
+  - Path selection, INT8 evaluation, early-exit, ST Edge AI summaries, training-history
+    summaries, and `bench_summary.csv` (on-device C1j benchmark).
 - `workspace/st_ai_output/`
   - Reserved folder for generated ST Edge AI outputs.
 - `workspace/st_ai_ws/`
@@ -39,4 +46,7 @@ Notes:
 
 - This part of the repository is deployment-focused and includes only the selected model artifacts and lightweight result summaries.
 - Full training checkpoints, datasets, CubeIDE build artifacts, and large generated workspaces are intentionally not committed here.
-- The MAX78000 implementation in `../MAX78000/` remains the more complete end-to-end reference for training and demo flow.
+- The STM32U5 track now covers the full path through **on-device streaming inference**
+  (firmware `C1j-ai-v2` with measured ~141 ms/frame) and a host+board early-exit
+  benchmark. The MAX78000 implementation in `../MAX78000/` still has the richer
+  host-side demo (live camera) and a more complete doc set.
