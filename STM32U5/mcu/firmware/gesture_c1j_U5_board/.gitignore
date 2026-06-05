@@ -1,0 +1,17 @@
+Debug/
+Release/
+.metadata/
+.ai/
+
+*.elf
+*.map
+*.list
+*.o
+*.d
+*.su
+*.cyclo
+objects.list
+objects.mk
+sources.mk
+subdir.mk
+makefile
