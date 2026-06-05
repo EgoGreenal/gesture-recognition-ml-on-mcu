@@ -1,0 +1,38 @@
+# Days 3-7: Super Teacher (Video Swin-T) + Teacher Assistant (TSM-MobileNetV2)
+# PyTorch 2.4 with CUDA 12.1 wheels (binary-compatible with system CUDA 12.2).
+# Install with:
+#   pip install --extra-index-url https://download.pytorch.org/whl/cu121 -r requirements_torch.txt
+
+torch==2.4.1
+torchvision==0.19.1
+torchaudio==2.4.1
+
+# Video + image pipeline
+opencv-python-headless>=4.9.0
+Pillow>=10.2.0
+decord>=0.6.0
+av>=12.0.0
+einops>=0.7.0
+
+# Training utilities
+timm>=1.0.0
+numpy<2.0
+scipy>=1.11
+scikit-learn>=1.3
+pandas>=2.0
+matplotlib>=3.7
+seaborn>=0.13
+tqdm>=4.66
+tensorboard>=2.15
+PyYAML>=6.0
+
+# Logging + experiment management
+omegaconf>=2.3
+hydra-core>=1.3
+
+# Dataset download
+kaggle>=1.6.0
+
+# Notebook (for inspection)
+jupyterlab>=4.0
+ipywidgets>=8.0
