@@ -1,0 +1,15 @@
+[
+  {
+    "obs_1.00": 0.8702238452694935,
+    "obs_0.75": 0.858862514370731,
+    "obs_0.50": 0.45147764928653544,
+    "obs_0.25": 0.17603300196118213,
+    "n_val": 14787,
+    "elapsed_s": 1929.9,
+    "throughput_samp_per_s": 7.66,
+    "tflite_path": "models/student_C1F/deploy/C1f_ptq_clip_int8.tflite",
+    "tflite_dtype": "int8",
+    "variant": "C1f",
+    "tag": "ptq"
+  }
+]

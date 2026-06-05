@@ -1,0 +1,1470 @@
+{
+  "variant": "C1j",
+  "tag": "ptq",
+  "tflite": "models/student_C1J/deploy/C1j_ptq_clip_int8.tflite",
+  "T": 8,
+  "img_size": 64,
+  "lat_per_frame_ms": 32.11,
+  "max_samples": 0,
+  "baseline_acc": 0.8648813146682898,
+  "results": [
+    {
+      "strategy": "BASELINE_NOEXIT",
+      "threshold": null,
+      "accuracy": 0.8648813146682898,
+      "mean_obs_ratio": 1.0,
+      "n_correct": 12789,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        14787
+      ]
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.85,
+      "min_exit_frame": 0,
+      "accuracy": 0.1097585717184013,
+      "mean_obs_ratio": 0.21839284506661258,
+      "n_correct": 1623,
+      "n_total": 14787,
+      "exit_hist": [
+        8952,
+        1282,
+        4208,
+        131,
+        129,
+        76,
+        2,
+        7
+      ],
+      "latency_ms": 56.1
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.9,
+      "min_exit_frame": 0,
+      "accuracy": 0.1169946574693988,
+      "mean_obs_ratio": 0.23656759315615067,
+      "n_correct": 1730,
+      "n_total": 14787,
+      "exit_hist": [
+        8178,
+        1137,
+        4949,
+        161,
+        186,
+        141,
+        14,
+        21
+      ],
+      "latency_ms": 60.77
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.93,
+      "min_exit_frame": 0,
+      "accuracy": 0.1255832826131061,
+      "mean_obs_ratio": 0.2559934401839454,
+      "n_correct": 1857,
+      "n_total": 14787,
+      "exit_hist": [
+        7366,
+        1041,
+        5662,
+        176,
+        236,
+        234,
+        15,
+        57
+      ],
+      "latency_ms": 65.76
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.95,
+      "min_exit_frame": 0,
+      "accuracy": 0.13904104957056873,
+      "mean_obs_ratio": 0.27771015080814226,
+      "n_correct": 2056,
+      "n_total": 14787,
+      "exit_hist": [
+        6570,
+        965,
+        6246,
+        219,
+        281,
+        341,
+        33,
+        132
+      ],
+      "latency_ms": 71.34
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.97,
+      "min_exit_frame": 0,
+      "accuracy": 0.14850882531953744,
+      "mean_obs_ratio": 0.29638364779874216,
+      "n_correct": 2196,
+      "n_total": 14787,
+      "exit_hist": [
+        5873,
+        810,
+        6891,
+        235,
+        302,
+        461,
+        41,
+        174
+      ],
+      "latency_ms": 76.14
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.98,
+      "min_exit_frame": 0,
+      "accuracy": 0.1610874416717387,
+      "mean_obs_ratio": 0.31398356664637855,
+      "n_correct": 2382,
+      "n_total": 14787,
+      "exit_hist": [
+        5396,
+        718,
+        7173,
+        260,
+        337,
+        551,
+        55,
+        297
+      ],
+      "latency_ms": 80.66
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.99,
+      "min_exit_frame": 0,
+      "accuracy": 0.18015824710894704,
+      "mean_obs_ratio": 0.343595725975519,
+      "n_correct": 2664,
+      "n_total": 14787,
+      "exit_hist": [
+        4491,
+        605,
+        7775,
+        286,
+        354,
+        707,
+        88,
+        481
+      ],
+      "latency_ms": 88.26
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.995,
+      "min_exit_frame": 0,
+      "accuracy": 0.2130249543517955,
+      "mean_obs_ratio": 0.38119632109285184,
+      "n_correct": 3150,
+      "n_total": 14787,
+      "exit_hist": [
+        3563,
+        527,
+        8118,
+        315,
+        404,
+        971,
+        95,
+        794
+      ],
+      "latency_ms": 97.92
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.999,
+      "min_exit_frame": 0,
+      "accuracy": 0.2666531412727396,
+      "mean_obs_ratio": 0.4460167714884696,
+      "n_correct": 3943,
+      "n_total": 14787,
+      "exit_hist": [
+        2247,
+        372,
+        8493,
+        292,
+        390,
+        1314,
+        142,
+        1537
+      ],
+      "latency_ms": 114.57
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.01,
+      "min_exit_frame": 0,
+      "accuracy": 0.2619192533982552,
+      "mean_obs_ratio": 0.44020930547102183,
+      "n_correct": 3873,
+      "n_total": 14787,
+      "exit_hist": [
+        2376,
+        382,
+        8444,
+        290,
+        391,
+        1304,
+        136,
+        1464
+      ],
+      "latency_ms": 113.08
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.05,
+      "min_exit_frame": 0,
+      "accuracy": 0.19435991073240008,
+      "mean_obs_ratio": 0.3600121728545344,
+      "n_correct": 2874,
+      "n_total": 14787,
+      "exit_hist": [
+        4054,
+        581,
+        7950,
+        304,
+        378,
+        829,
+        86,
+        605
+      ],
+      "latency_ms": 92.48
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.1,
+      "min_exit_frame": 0,
+      "accuracy": 0.1645364171231487,
+      "mean_obs_ratio": 0.31949516467167105,
+      "n_correct": 2433,
+      "n_total": 14787,
+      "exit_hist": [
+        5215,
+        663,
+        7347,
+        257,
+        335,
+        595,
+        60,
+        315
+      ],
+      "latency_ms": 82.07
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.2,
+      "min_exit_frame": 0,
+      "accuracy": 0.1414756204774464,
+      "mean_obs_ratio": 0.2842277000067627,
+      "n_correct": 2092,
+      "n_total": 14787,
+      "exit_hist": [
+        6358,
+        851,
+        6504,
+        219,
+        290,
+        380,
+        35,
+        150
+      ],
+      "latency_ms": 73.01
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.3,
+      "min_exit_frame": 0,
+      "accuracy": 0.12321633867586393,
+      "mean_obs_ratio": 0.25594271995671874,
+      "n_correct": 1822,
+      "n_total": 14787,
+      "exit_hist": [
+        7360,
+        972,
+        5776,
+        161,
+        226,
+        223,
+        19,
+        50
+      ],
+      "latency_ms": 65.75
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.5,
+      "min_exit_frame": 0,
+      "accuracy": 0.10786501656860756,
+      "mean_obs_ratio": 0.21738689389328464,
+      "n_correct": 1595,
+      "n_total": 14787,
+      "exit_hist": [
+        9098,
+        1093,
+        4269,
+        117,
+        121,
+        79,
+        2,
+        8
+      ],
+      "latency_ms": 55.84
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.8,
+      "min_exit_frame": 0,
+      "accuracy": 0.09204030567390276,
+      "mean_obs_ratio": 0.16654831946980456,
+      "n_correct": 1361,
+      "n_total": 14787,
+      "exit_hist": [
+        11891,
+        919,
+        1949,
+        17,
+        8,
+        3,
+        0,
+        0
+      ],
+      "latency_ms": 42.78
+    },
+    {
+      "strategy": "S3",
+      "threshold": 1.2,
+      "min_exit_frame": 0,
+      "accuracy": 0.08385744234800839,
+      "mean_obs_ratio": 0.13424798809765334,
+      "n_correct": 1240,
+      "n_total": 14787,
+      "exit_hist": [
+        14021,
+        439,
+        326,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "latency_ms": 34.49
+    },
+    {
+      "strategy": "S3",
+      "threshold": 2.0,
+      "min_exit_frame": 0,
+      "accuracy": 0.07932643538243052,
+      "mean_obs_ratio": 0.12500845337120445,
+      "n_correct": 1173,
+      "n_total": 14787,
+      "exit_hist": [
+        14786,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "latency_ms": 32.11
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.85,
+      "min_exit_frame": 3,
+      "accuracy": 0.5389193210252249,
+      "mean_obs_ratio": 0.6166480692500169,
+      "n_correct": 7969,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        5643,
+        5416,
+        3143,
+        243,
+        342
+      ],
+      "latency_ms": 158.4
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.9,
+      "min_exit_frame": 3,
+      "accuracy": 0.5671197673632244,
+      "mean_obs_ratio": 0.6374264556705214,
+      "n_correct": 8386,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        4741,
+        5333,
+        3801,
+        326,
+        586
+      ],
+      "latency_ms": 163.74
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.93,
+      "min_exit_frame": 3,
+      "accuracy": 0.5980252924866437,
+      "mean_obs_ratio": 0.657799080273213,
+      "n_correct": 8843,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        4094,
+        5005,
+        4350,
+        390,
+        948
+      ],
+      "latency_ms": 168.98
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.95,
+      "min_exit_frame": 3,
+      "accuracy": 0.6277135321566241,
+      "mean_obs_ratio": 0.6790170419963482,
+      "n_correct": 9282,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        3551,
+        4640,
+        4688,
+        471,
+        1437
+      ],
+      "latency_ms": 174.43
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.97,
+      "min_exit_frame": 3,
+      "accuracy": 0.6591600730371272,
+      "mean_obs_ratio": 0.6965831473591668,
+      "n_correct": 9747,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        3041,
+        4239,
+        5243,
+        526,
+        1738
+      ],
+      "latency_ms": 178.94
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.98,
+      "min_exit_frame": 3,
+      "accuracy": 0.6805301954419423,
+      "mean_obs_ratio": 0.7130925813214309,
+      "n_correct": 10063,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        2728,
+        3914,
+        5352,
+        582,
+        2211
+      ],
+      "latency_ms": 183.18
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.99,
+      "min_exit_frame": 3,
+      "accuracy": 0.7104213160208291,
+      "mean_obs_ratio": 0.7387739230405086,
+      "n_correct": 10505,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        2251,
+        3416,
+        5540,
+        570,
+        3010
+      ],
+      "latency_ms": 189.78
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.995,
+      "min_exit_frame": 3,
+      "accuracy": 0.7377426117535674,
+      "mean_obs_ratio": 0.763677554608778,
+      "n_correct": 10909,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        1892,
+        2883,
+        5599,
+        541,
+        3872
+      ],
+      "latency_ms": 196.17
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.999,
+      "min_exit_frame": 3,
+      "accuracy": 0.7804152295935619,
+      "mean_obs_ratio": 0.810543044566173,
+      "n_correct": 11540,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        1323,
+        2067,
+        5179,
+        561,
+        5657
+      ],
+      "latency_ms": 208.21
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.01,
+      "min_exit_frame": 3,
+      "accuracy": 0.7771691350510583,
+      "mean_obs_ratio": 0.8062318252519105,
+      "n_correct": 11492,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        1363,
+        2131,
+        5251,
+        575,
+        5467
+      ],
+      "latency_ms": 207.1
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.05,
+      "min_exit_frame": 3,
+      "accuracy": 0.7240143369175627,
+      "mean_obs_ratio": 0.7506086427267195,
+      "n_correct": 10706,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        2089,
+        3156,
+        5553,
+        572,
+        3417
+      ],
+      "latency_ms": 192.82
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.1,
+      "min_exit_frame": 3,
+      "accuracy": 0.6896598363427335,
+      "mean_obs_ratio": 0.7185534591194969,
+      "n_correct": 10198,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        2580,
+        3775,
+        5524,
+        601,
+        2307
+      ],
+      "latency_ms": 184.58
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.2,
+      "min_exit_frame": 3,
+      "accuracy": 0.642591465476432,
+      "mean_obs_ratio": 0.6869209440724962,
+      "n_correct": 9502,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        3284,
+        4486,
+        4974,
+        494,
+        1549
+      ],
+      "latency_ms": 176.46
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.3,
+      "min_exit_frame": 3,
+      "accuracy": 0.6039088388449314,
+      "mean_obs_ratio": 0.6596757286805979,
+      "n_correct": 8930,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        3934,
+        4990,
+        4570,
+        413,
+        880
+      ],
+      "latency_ms": 169.46
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.5,
+      "min_exit_frame": 3,
+      "accuracy": 0.5460201528369514,
+      "mean_obs_ratio": 0.622480895381078,
+      "n_correct": 8074,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        5250,
+        5559,
+        3366,
+        250,
+        362
+      ],
+      "latency_ms": 159.9
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.8,
+      "min_exit_frame": 3,
+      "accuracy": 0.48366808683302903,
+      "mean_obs_ratio": 0.5753956177723676,
+      "n_correct": 7152,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        7785,
+        5207,
+        1707,
+        54,
+        34
+      ],
+      "latency_ms": 147.81
+    },
+    {
+      "strategy": "S3",
+      "threshold": 1.2,
+      "min_exit_frame": 3,
+      "accuracy": 0.4476229120173125,
+      "mean_obs_ratio": 0.5377950226550349,
+      "n_correct": 6619,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        10773,
+        3564,
+        444,
+        5,
+        1
+      ],
+      "latency_ms": 138.15
+    },
+    {
+      "strategy": "S3",
+      "threshold": 2.0,
+      "min_exit_frame": 3,
+      "accuracy": 0.44748765807804153,
+      "mean_obs_ratio": 0.5011327517413945,
+      "n_correct": 6617,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        14653,
+        134,
+        0,
+        0,
+        0
+      ],
+      "latency_ms": 128.73
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.85,
+      "min_exit_frame": 4,
+      "accuracy": 0.5061202407520119,
+      "mean_obs_ratio": 0.6821109758571718,
+      "n_correct": 7484,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        9209,
+        4836,
+        306,
+        436
+      ],
+      "latency_ms": 175.22
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.9,
+      "min_exit_frame": 4,
+      "accuracy": 0.5445323595049706,
+      "mean_obs_ratio": 0.6946473253533509,
+      "n_correct": 8052,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        8313,
+        5402,
+        379,
+        693
+      ],
+      "latency_ms": 178.44
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.93,
+      "min_exit_frame": 4,
+      "accuracy": 0.581794819774126,
+      "mean_obs_ratio": 0.7088658957192128,
+      "n_correct": 8603,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        7434,
+        5853,
+        432,
+        1068
+      ],
+      "latency_ms": 182.09
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.95,
+      "min_exit_frame": 4,
+      "accuracy": 0.6166903361060391,
+      "mean_obs_ratio": 0.7244454588489889,
+      "n_correct": 9119,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        6635,
+        6088,
+        516,
+        1548
+      ],
+      "latency_ms": 186.1
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.97,
+      "min_exit_frame": 4,
+      "accuracy": 0.6486102657739906,
+      "mean_obs_ratio": 0.7357476161493204,
+      "n_correct": 9591,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        5908,
+        6485,
+        566,
+        1828
+      ],
+      "latency_ms": 189.0
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.98,
+      "min_exit_frame": 4,
+      "accuracy": 0.6703861499966186,
+      "mean_obs_ratio": 0.7482501521606817,
+      "n_correct": 9913,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        5398,
+        6489,
+        609,
+        2291
+      ],
+      "latency_ms": 192.21
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.99,
+      "min_exit_frame": 4,
+      "accuracy": 0.7026442145127477,
+      "mean_obs_ratio": 0.7676590924460674,
+      "n_correct": 10390,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        4636,
+        6496,
+        585,
+        3070
+      ],
+      "latency_ms": 197.2
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.995,
+      "min_exit_frame": 4,
+      "accuracy": 0.7320619463041861,
+      "mean_obs_ratio": 0.7882853181848921,
+      "n_correct": 10825,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        3890,
+        6408,
+        559,
+        3930
+      ],
+      "latency_ms": 202.49
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.999,
+      "min_exit_frame": 4,
+      "accuracy": 0.7781835395955907,
+      "mean_obs_ratio": 0.827669574626361,
+      "n_correct": 11507,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        2772,
+        5749,
+        572,
+        5694
+      ],
+      "latency_ms": 212.61
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.01,
+      "min_exit_frame": 4,
+      "accuracy": 0.7744640562656387,
+      "mean_obs_ratio": 0.8238824643267735,
+      "n_correct": 11452,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        2859,
+        5835,
+        587,
+        5506
+      ],
+      "latency_ms": 211.64
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.05,
+      "min_exit_frame": 4,
+      "accuracy": 0.7171840129843782,
+      "mean_obs_ratio": 0.7777016974369378,
+      "n_correct": 10605,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        4272,
+        6448,
+        585,
+        3482
+      ],
+      "latency_ms": 199.78
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.1,
+      "min_exit_frame": 4,
+      "accuracy": 0.6791776560492324,
+      "mean_obs_ratio": 0.7516315006424562,
+      "n_correct": 10043,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        5189,
+        6595,
+        624,
+        2379
+      ],
+      "latency_ms": 193.08
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.2,
+      "min_exit_frame": 4,
+      "accuracy": 0.6300804760938662,
+      "mean_obs_ratio": 0.7289595590721579,
+      "n_correct": 9317,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        6317,
+        6289,
+        534,
+        1647
+      ],
+      "latency_ms": 187.26
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.3,
+      "min_exit_frame": 4,
+      "accuracy": 0.5879488740109555,
+      "mean_obs_ratio": 0.7085700277270576,
+      "n_correct": 8694,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        7314,
+        6037,
+        459,
+        977
+      ],
+      "latency_ms": 182.02
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.5,
+      "min_exit_frame": 4,
+      "accuracy": 0.5121390410495705,
+      "mean_obs_ratio": 0.6833198079394063,
+      "n_correct": 7573,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        9065,
+        4981,
+        305,
+        436
+      ],
+      "latency_ms": 175.53
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.8,
+      "min_exit_frame": 4,
+      "accuracy": 0.40670859538784065,
+      "mean_obs_ratio": 0.6552884290254953,
+      "n_correct": 6014,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        11385,
+        3274,
+        75,
+        53
+      ],
+      "latency_ms": 168.33
+    },
+    {
+      "strategy": "S3",
+      "threshold": 1.2,
+      "min_exit_frame": 4,
+      "accuracy": 0.3103401636572665,
+      "mean_obs_ratio": 0.6371136809359572,
+      "n_correct": 4589,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        13371,
+        1402,
+        11,
+        3
+      ],
+      "latency_ms": 163.66
+    },
+    {
+      "strategy": "S3",
+      "threshold": 2.0,
+      "min_exit_frame": 4,
+      "accuracy": 0.24244268614323392,
+      "mean_obs_ratio": 0.6253973084466085,
+      "n_correct": 3585,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        14740,
+        47,
+        0,
+        0
+      ],
+      "latency_ms": 160.65
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.85,
+      "min_exit_frame": 5,
+      "accuracy": 0.8669101237573544,
+      "mean_obs_ratio": 0.7758419557719619,
+      "n_correct": 12819,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        12840,
+        837,
+        1110
+      ],
+      "latency_ms": 199.3
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.9,
+      "min_exit_frame": 5,
+      "accuracy": 0.8679245283018868,
+      "mean_obs_ratio": 0.782334144856969,
+      "n_correct": 12834,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        12445,
+        859,
+        1483
+      ],
+      "latency_ms": 200.97
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.93,
+      "min_exit_frame": 5,
+      "accuracy": 0.8673158855751674,
+      "mean_obs_ratio": 0.790432474470819,
+      "n_correct": 12825,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        11972,
+        847,
+        1968
+      ],
+      "latency_ms": 203.05
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.95,
+      "min_exit_frame": 5,
+      "accuracy": 0.8680597822411578,
+      "mean_obs_ratio": 0.7999763305606276,
+      "n_correct": 12836,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        11382,
+        898,
+        2507
+      ],
+      "latency_ms": 205.5
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.97,
+      "min_exit_frame": 5,
+      "accuracy": 0.8683302901196998,
+      "mean_obs_ratio": 0.8042790965036857,
+      "n_correct": 12840,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        11135,
+        883,
+        2769
+      ],
+      "latency_ms": 206.6
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.98,
+      "min_exit_frame": 5,
+      "accuracy": 0.8694123216338676,
+      "mean_obs_ratio": 0.8124365997159667,
+      "n_correct": 12856,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        10646,
+        896,
+        3245
+      ],
+      "latency_ms": 208.7
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.99,
+      "min_exit_frame": 5,
+      "accuracy": 0.8690065598160547,
+      "mean_obs_ratio": 0.8252265503482789,
+      "n_correct": 12850,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        9927,
+        821,
+        4039
+      ],
+      "latency_ms": 211.98
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.995,
+      "min_exit_frame": 5,
+      "accuracy": 0.8683979170893352,
+      "mean_obs_ratio": 0.838828024616217,
+      "n_correct": 12841,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        9162,
+        742,
+        4883
+      ],
+      "latency_ms": 215.48
+    },
+    {
+      "strategy": "S1",
+      "threshold": 0.999,
+      "min_exit_frame": 5,
+      "accuracy": 0.8669101237573544,
+      "mean_obs_ratio": 0.8667410563332657,
+      "n_correct": 12819,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        7543,
+        678,
+        6566
+      ],
+      "latency_ms": 222.65
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.01,
+      "min_exit_frame": 5,
+      "accuracy": 0.8673835125448028,
+      "mean_obs_ratio": 0.8639598972070062,
+      "n_correct": 12826,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        7699,
+        695,
+        6393
+      ],
+      "latency_ms": 221.93
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.05,
+      "min_exit_frame": 5,
+      "accuracy": 0.8689389328464191,
+      "mean_obs_ratio": 0.8316342057212416,
+      "n_correct": 12849,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        9566,
+        785,
+        4436
+      ],
+      "latency_ms": 213.63
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.1,
+      "min_exit_frame": 5,
+      "accuracy": 0.8694123216338676,
+      "mean_obs_ratio": 0.8138060458510854,
+      "n_correct": 12856,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        10567,
+        892,
+        3328
+      ],
+      "latency_ms": 209.05
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.2,
+      "min_exit_frame": 5,
+      "accuracy": 0.8679921552715223,
+      "mean_obs_ratio": 0.801109082302022,
+      "n_correct": 12835,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        11322,
+        884,
+        2581
+      ],
+      "latency_ms": 205.79
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.3,
+      "min_exit_frame": 5,
+      "accuracy": 0.8679921552715223,
+      "mean_obs_ratio": 0.7877189423141949,
+      "n_correct": 12835,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        12118,
+        876,
+        1793
+      ],
+      "latency_ms": 202.35
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.5,
+      "min_exit_frame": 5,
+      "accuracy": 0.867113004666261,
+      "mean_obs_ratio": 0.7749374450530871,
+      "n_correct": 12822,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        12902,
+        820,
+        1065
+      ],
+      "latency_ms": 199.07
+    },
+    {
+      "strategy": "S3",
+      "threshold": 0.8,
+      "min_exit_frame": 5,
+      "accuracy": 0.8600797998241699,
+      "mean_obs_ratio": 0.7575150470007439,
+      "n_correct": 12718,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        14171,
+        343,
+        273
+      ],
+      "latency_ms": 194.59
+    },
+    {
+      "strategy": "S3",
+      "threshold": 1.2,
+      "min_exit_frame": 5,
+      "accuracy": 0.8575776019476568,
+      "mean_obs_ratio": 0.7524261175356732,
+      "n_correct": 12681,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        14564,
+        159,
+        64
+      ],
+      "latency_ms": 193.28
+    },
+    {
+      "strategy": "S3",
+      "threshold": 2.0,
+      "min_exit_frame": 5,
+      "accuracy": 0.8569013322513018,
+      "mean_obs_ratio": 0.7501775207952932,
+      "n_correct": 12671,
+      "n_total": 14787,
+      "exit_hist": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        14767,
+        19,
+        1
+      ],
+      "latency_ms": 192.71
+    }
+  ]
+}

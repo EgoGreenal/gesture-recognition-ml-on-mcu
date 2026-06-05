@@ -1,0 +1,79 @@
+{
+  "rows": [
+    {
+      "variant": "C1n",
+      "status": "ok",
+      "family": "C1",
+      "mode": "sequence",
+      "kd": "per_frame",
+      "params": 701979,
+      "T": 8,
+      "img_size": 64,
+      "best_val_obs_1.00": 0.8671,
+      "last_val_obs_0.75": 0.8678,
+      "last_val_obs_0.50": 0.4588,
+      "last_val_obs_0.25": 0.1892,
+      "macs_per_call": 19547035,
+      "ram_bytes": 489856,
+      "weights_bytes": 2770540,
+      "int8_kb": 2740.6,
+      "lat_per_frame_ms": 70.16,
+      "lat_per_clip_ms": 561.25,
+      "ckpt": "/leonardo_work/IscrB_WearUsFM/jzhang03/MLonMCU/models/student_C1N/41495944_2/best.weights.h5"
+    },
+    {
+      "variant": "C1o",
+      "status": "ok",
+      "family": "C1",
+      "mode": "sequence",
+      "kd": "per_frame",
+      "params": 1545643,
+      "T": 8,
+      "img_size": 64,
+      "best_val_obs_1.00": 0.8717,
+      "last_val_obs_0.75": 0.8665,
+      "last_val_obs_0.50": 0.4682,
+      "last_val_obs_0.25": 0.1791,
+      "macs_per_call": 18565667,
+      "ram_bytes": 477092,
+      "weights_bytes": 6126732,
+      "int8_kb": 6027.8,
+      "lat_per_frame_ms": 66.89,
+      "lat_per_clip_ms": 535.08,
+      "ckpt": "/leonardo_work/IscrB_WearUsFM/jzhang03/MLonMCU/models/student_C1O/41495944_3/best.weights.h5"
+    },
+    {
+      "variant": "C1j",
+      "status": "ok",
+      "family": "C1",
+      "mode": "sequence",
+      "kd": "per_frame",
+      "params": 721979,
+      "T": 8,
+      "img_size": 64,
+      "best_val_obs_1.00": 0.8665,
+      "last_val_obs_0.75": 0.8587,
+      "last_val_obs_0.50": 0.466,
+      "last_val_obs_0.25": 0.1779,
+      "macs_per_call": 8132051,
+      "ram_bytes": 267328,
+      "weights_bytes": 2850828,
+      "int8_kb": 2828.8,
+      "lat_per_frame_ms": 32.11,
+      "lat_per_clip_ms": 256.85,
+      "ckpt": "/leonardo_work/IscrB_WearUsFM/jzhang03/MLonMCU/models/student_C1J/41478885_6/best.weights.h5"
+    }
+  ],
+  "survivors": [
+    "C1o",
+    "C1n",
+    "C1j"
+  ],
+  "top_3": [
+    "C1o",
+    "C1n",
+    "C1j"
+  ],
+  "sram_budget_kb": 600,
+  "latency_budget_ms_per_frame": 150.0
+}

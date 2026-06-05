@@ -1,0 +1,46 @@
+{
+  "primary_variant": "C1j",
+  "primary_deploy_model": "C1j_ptq_streaming_sm_int8.tflite",
+  "host_eval_model": "C1j_ptq_clip_int8.tflite",
+  "backup_variant": "C1f",
+  "backup_deploy_model": "C1f_ptq_streaming_sm_int8.tflite",
+  "training_config": {
+    "family": "C1",
+    "input_mode": "sequence",
+    "kd_mode": "per_frame",
+    "frames": 8,
+    "img_size": 64,
+    "params": 721979,
+    "epochs": 60,
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "alpha": 0.3,
+    "temperature": 4.0,
+    "frame_weights": [0.1, 0.2, 0.3, 0.4],
+    "job_id": "41478885_6"
+  },
+  "selection_summary": {
+    "path_selection_survivors": ["C1o", "C1n", "C1j"],
+    "c1j_best_val_obs_1_00": 0.8665,
+    "c1j_clip_int8_val_acc": 0.8648813146682898,
+    "stedgeai_macc": 8132051,
+    "stedgeai_ram_bytes": 267328,
+    "stedgeai_weights_bytes": 2850828,
+    "stedgeai_latency_ms_per_frame": 32.11,
+    "early_exit_best_under_1pp_drop": {
+      "strategy": "S3",
+      "threshold": 2.0,
+      "min_exit_frame": 5,
+      "accuracy": 0.8569013322513018,
+      "mean_obs_ratio": 0.7501775207952932,
+      "latency_ms": 192.71
+    }
+  },
+  "generated_c_package": "stedgeai_generate_int8/",
+  "notes": [
+    "The primary STM32U5 deployment path uses the true INT8 streaming model.",
+    "The clip-form INT8 model is kept for host-side evaluation and reporting.",
+    "Only compact, final artifacts are committed here; raw training checkpoints are excluded."
+  ]
+}

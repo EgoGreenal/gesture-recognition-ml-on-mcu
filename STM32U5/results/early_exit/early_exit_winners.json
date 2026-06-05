@@ -1,0 +1,31 @@
+{
+  "max_drop_pp": 1.0,
+  "baselines": {
+    "C1f": 0.8702238452694935,
+    "C1j": 0.8648813146682898
+  },
+  "winners": {
+    "C1f": {
+      "variant": "C1f",
+      "strategy": "S3",
+      "threshold": 0.8,
+      "min_exit_frame": 5,
+      "accuracy": 0.8615675931561507,
+      "mean_obs_ratio": 0.7569655778724556,
+      "latency_ms": 382.72,
+      "baseline_acc": 0.8702238452694935,
+      "acc_drop_pp": 0.8656252113342755
+    },
+    "C1j": {
+      "variant": "C1j",
+      "strategy": "S3",
+      "threshold": 2.0,
+      "min_exit_frame": 5,
+      "accuracy": 0.8569013322513018,
+      "mean_obs_ratio": 0.7501775207952932,
+      "latency_ms": 192.71,
+      "baseline_acc": 0.8648813146682898,
+      "acc_drop_pp": 0.7979982416987941
+    }
+  }
+}

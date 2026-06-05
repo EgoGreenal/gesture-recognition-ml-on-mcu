@@ -1,0 +1,14 @@
+[
+  {
+    "tflite": "models/student_C1J/deploy/C1j_ptq_streaming_int8.fp32.tflite",
+    "name": "student_C1j_ptq",
+    "returncode": 0,
+    "elapsed_s": 304.44,
+    "macc": 8132051,
+    "ram_bytes": 267328,
+    "rom_bytes": null,
+    "weights_bytes": 2850828,
+    "lat_per_frame_ms": 32.11,
+    "lat_per_clip_ms": 256.85
+  }
+]

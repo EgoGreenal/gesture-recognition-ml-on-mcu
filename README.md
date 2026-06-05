@@ -36,6 +36,8 @@ gesture-recognition-ml-on-mcu/
     deploy/
     docs/
     firmware/
+    models/
+    results/
     workspace/
 ```
 
@@ -73,7 +75,11 @@ The `STM32U5/` directory now contains the STM32U5 deployment-side project materi
 - `STM32U5/deploy/`
   - Host-side UART tooling and deployment-oriented reference code.
 - `STM32U5/docs/`
-  - Bring-up and deployment checklist for the STM32U5 board workflow.
+  - Bring-up checklist, probe notes, and a compact workflow summary for the STM32U5 board path.
+- `STM32U5/models/`
+  - Selected deployable TFLite artifacts and generated ST Edge AI C sources for the chosen U5 model.
+- `STM32U5/results/`
+  - Lightweight summaries for path selection, INT8 evaluation, early-exit sweeps, and ST Edge AI analysis.
 - `STM32U5/workspace/`
   - Reserved workspace folders for ST Edge AI / STM32CubeIDE generated outputs.
 
