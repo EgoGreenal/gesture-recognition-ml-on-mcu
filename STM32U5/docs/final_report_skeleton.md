@@ -26,8 +26,10 @@ A real-time gesture-recognition system deployed on STM32U5 (B-U585I-IOT02A, Cort
 
 ## 3. Model architecture — three-stage TAKD distillation
 ### 3.1 Teacher (Day 3-4)
-- Swin-T (~28M params) on Jester
-- val acc: **[FILL — find from models/super_teacher.../metrics.json]**
+- Swin-T (~28M params) on Jester, 30 epochs, ~1.6 h wall
+- val acc: **94.71% Top-1** (best, epoch 28; Top-5 99.77%). SWA+TTA lifts it to
+  **94.98% Top-1 / 99.78% Top-5** (`swa_tta_eval`), which is the checkpoint used to
+  generate the soft labels distilled into the TA.
 
 ### 3.2 Teacher Assistant (Day 6-7)
 - TSM-MobileNetV2 full (17 blocks, w=1.0, RGB 112×112)
@@ -87,9 +89,9 @@ PTQ performed clearly better than the Plan expected (expected 1-3 pp, actual ≤
 
 | Metric | Value |
 |---|---:|
-| INT8 acc (full Jester val) | **86.69%** |
-| Drop vs C1j baseline | 0.0 pp (=baseline) |
-| Drop vs C1j FP32 | -0.66 pp |
+| INT8 acc, S1 early exit (full Jester val, host) | **86.69%** |
+| vs C1j no-exit INT8 baseline (86.49%) | +0.20 pp (early exit ≈ no drop; later frames occasionally flip correct→wrong) |
+| vs C1j FP32 (86.65%) | +0.04 pp |
 | mean obs ratio | 0.776 |
 | mean frame count | 6.2 / 8 |
 | offline est. lat/clip | 199 ms (X-CUBE-AI estimate, low) |
@@ -101,18 +103,70 @@ PTQ performed clearly better than the Plan expected (expected 1-3 pp, actual ≤
 | C1j per-frame MACs | 8.13M |
 
 ## 7. U5 deployment (Day 13)
-**[FILL — pending Day 13 completion]**
 
-### 7.1 X-CUBE-AI 9.1 integration
+Deployed as a full STM32CubeIDE project, `STM32U5/mcu/firmware/gesture_c1j_U5_board/`
+(firmware **`C1j-ai-v2`**) on the B-U585I-IOT02A. See
+[MCU_FIRMWARE.md](MCU_FIRMWARE.md) and [STEDGEAI_DEPLOYMENT.md](STEDGEAI_DEPLOYMENT.md).
+
+### 7.1 X-CUBE-AI integration
+- C1j streaming INT8 TFLite → ST Edge AI Core 4.0 (= STM32Cube.AI 12.0) `generate` →
+  C network (`student_c1j_ptq_int8.c/.h/_data.c`) under `X-CUBE-AI/App/`, linked against
+  the X-CUBE-AI runtime `NetworkRuntime1020_CM33_GCC.a`.
+- Footprint on board: Flash ≈ 0.99 MB, SRAM (activations) ≈ 261 KiB — both within budget.
+
 ### 7.2 Cache buffer maintenance code
-### 7.3 Early-exit hook + INT8 softmax implementation
+- The streaming graph exposes **10 TSM cache tensors** (one per uni-directional shift
+  boundary; total ≈ 1.2 KB). `app_x-cube-ai.c` holds the `s_cache_in_idx` /
+  `s_cache_out_idx` / `s_cache_bytes` tables and, after each `ai_run`, copies each
+  `cache_out[i]` back into the matching `cache_in[i]` for the next frame.
+- Because the toolchain keeps the cache_in/cache_out quantization scales identical, the
+  copy is a plain `memcpy` (no rescale) — confirmed in the Day 8 probe.
+- `ai_streaming_reset()` zeroes the frame + all caches at the start of each clip.
+
+### 7.3 Early-exit hook + INT8 softmax
+- The board runs `ai_streaming_step(frame, logits, cycles)` per frame and returns INT8
+  logits + argmax + a DWT cycle count over a 1-byte UART command protocol
+  (`I` reset / `F` frame).
+- The **early-exit decision (S1 max-softmax, threshold 0.85, min_exit_frame 5) is
+  currently applied host-side** (`host_benchmark.py`). Folding it into the firmware is
+  ~10 lines (an INT8 softmax-max + compare) and is the one remaining device-side step.
+
 ### 7.4 LED1-4 light-control mapping
+- **Not implemented.** The deliverable validates recognition + latency over UART, not a
+  standalone light-control demo. Mapping the predicted class to the on-board LEDs is
+  listed under future work (§10).
 
 ## 8. System-level evaluation (Day 14)
-**[FILL — Day 14]**
-- End-to-end latency profiling (on-board measured vs Plan estimate)
-- Misrecognition case study
-- Live demo video
+
+### 8.1 End-to-end latency: measured vs estimate
+On-board DWT measurement (`bench_*.json`, summarised in
+[../results/bench_summary.csv](../results/bench_summary.csv)):
+
+| | Offline X-CUBE-AI estimate | On-board measured |
+|---|---|---|
+| per-frame | 32.11 ms | **~141 ms** |
+| effective throughput | ~300 MMAC/s (assumed) | ~57 MMAC/s |
+| per-clip (compute, ~6.2 frames, S1 exit) | ~199 ms | **~880 ms** |
+
+The estimate under-predicted real silicon by ~2-4×. The per-frame latency (141 ms) still
+meets the 150 ms/frame hard budget; the per-clip figure is compute-only (cycle-based, no
+UART). Likely cause: the streaming graph's Slice/Concat + small per-layer tiles do not hit
+peak Helium INT8 utilisation. **Action item:** confirm the cmsis-nn / Helium optimisation
+level is enabled in the X-CUBE-AI build settings (a non-optimised build would be slower
+still).
+
+### 8.2 Accuracy on the board
+S1 mf=5 thr=0.85 on a 128-clip subset: **84.4%** (mean exit frame 5.23, obs 0.778). This
+is **not** directly comparable to the 86.49% full-val (14,787-clip, no-exit) baseline — it
+carries n=128 sampling variance (±~6 pp) plus the early-exit drop and the
+streaming-vs-clip INT8 export. Per-class quality on the full val set
+(`../results/confusion_summary.csv`): C1j top-1 86.49% / mean-class 85.73%.
+
+### 8.3 Limitations
+- A **full-set on-device run** was not done (it would stream all 14,787 clips over UART);
+  it needs the firmware-side exit decision first (§7.3).
+- A **misrecognition case study** and a **live demo video** were not produced (no live
+  camera path on the U5 track).
 
 ## 9. Lessons learned (gotcha-diary summary)
 1. **From-scratch tiny CNN is not the route** (V0-V9 ceiling 38%; the C1 line — same topology as the TA + KD distillation — jumps to 84%)
@@ -134,11 +188,48 @@ PTQ performed clearly better than the Plan expected (expected 1-3 pp, actual ≤
 
 ---
 
-## Appendix A: all stedgeai analyze numbers
-**[FILL — from models/qat_comparison.csv + the Day 13 stedgeai generate report]**
+## Appendix A: quantization + ST Edge AI numbers
+
+From `models/qat_comparison.csv` (deployment candidates; QAT skipped, see §5.2):
+
+| Variant | Params | FP32 obs@1.0 | PTQ INT8 obs@1.0 | Drop | MACs/frame | INT8 weights | INT8 SRAM | Est. lat/frame | Tier |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| C1f | 1,389,579 | 87.35% | 87.02% | 0.32 pp | 16.59 M | 1382.7 KB | 128.7 KB | 63.2 ms | default |
+| C1j | 721,979 | 86.65% | 86.49% | 0.16 pp | 7.59 M | 723.2 KB | 68.1 KB | 32.11 ms | default |
+
+ST Edge AI `analyze` on the C1j streaming graph (`results/stedgeai/`): MACC 8.13 M/frame,
+RAM 267,328 B (≈261 KiB), returncode 0. All constraints pass (Flash < 2 MB, SRAM < 600 KiB,
+< 150 ms/frame). The `Est. lat/frame` above is the offline estimate; the **board measured
+~141 ms/frame** for C1j (§8.1, `results/bench_summary.csv`). MACs differ slightly between
+the clip (7.59 M) and streaming (8.13 M) exports.
 
 ## Appendix B: repro instructions
-**[FILL — from README]**
 
-## Appendix C: daily commit history + resource accounting
-**[FILL — Plan Section 9 summary]**
+1. Environment + dataset: `STM32U5/docs/INSTALL.md`.
+2. Training pipeline (Teacher → TA → Path-C student, then QAT/PTQ): `STM32U5/docs/TRAINING.md`
+   (scripts under `STM32U5/training/`, SLURM jobs in `STM32U5/docs/SERVER_TRAINING.md`).
+3. INT8 export + ST Edge AI C generation: `STM32U5/docs/STEDGEAI_DEPLOYMENT.md`.
+4. On-device deployment + benchmark: `STM32U5/docs/MCU_FIRMWARE.md` and
+   `STM32U5/docs/HOST_DEMO.md` (open `STM32U5/mcu/firmware/gesture_c1j_U5_board/` in
+   STM32CubeIDE, flash, then `python host_benchmark.py --data jester_val_int8.npz`).
+5. Early-exit analysis: `STM32U5/docs/EARLY_EXIT.md`.
+6. Result summaries reproduced from logs/artifacts (no retraining): `STM32U5/results/README.md`.
+
+## Appendix C: resource accounting
+
+Total compute ≈ **42 GPU-hours** (single-GPU equivalent) against the 100 GPU-hr Plan
+budget (~58 left). Per-stage wall time (from the SLURM logs; see
+`results/model_training_summary.csv`):
+
+| Stage | Job | Wall time |
+|---|---|---|
+| Super Teacher (Swin-T) | 1×4-GPU DDP, 30 ep | ~1.6 h |
+| Teacher Assistant (TSM-MBV2) | partial-node | a few h |
+| Student V0-V6 (dead line) | 7× 1-GPU array | ~3.5-4.4 h each (parallel) |
+| Path-C / C1 deep sweep | 1-GPU array | C1j 60 ep ≈ 3.0 h, others ~1.2 h |
+| INT8 eval / early-exit / stedgeai | short CPU/1-GPU jobs | minutes-scale |
+
+Milestone timeline (14 days): Day 1-2 data, 3-5 teacher, 6-7 TA + KD, 8 streaming probe,
+9-10 Path-C arch search, 11 quantization, 12 early exit, 13-14 deployment + evaluation.
+(A detailed day-by-day commit log lives in the development repository, not in this
+deliverable.)
