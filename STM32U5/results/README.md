@@ -17,6 +17,11 @@ This directory contains lightweight summary artifacts used to justify the STM32U
   - **On-device** benchmark of the deployed C1j streaming INT8 model (S1 @ 0.85,
     min_exit_frame 5), extracted from `../mcu/firmware/gesture_c1j_U5_board/bench_*.json`:
     accuracy, mean exit frame, observation ratio, measured ms/frame.
+  - **Sample size:** these are **small on-device test subsets** (max 128 clips →
+    84.4 %), *not* the full set. The **86.49 %** in `int8_eval/` and
+    `model_training_summary.csv` is the **full 14,787-clip** no-exit evaluation. The
+    two are not directly comparable (n=128 sampling variance + early-exit drop). See
+    `../docs/EARLY_EXIT.md`.
 
 > **Estimated vs measured latency.** The `latency`/`lat_per_frame_ms` fields in
 > `analyze_summary.json`, `model_training_summary.csv`, and `path_selection/` are

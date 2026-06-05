@@ -46,13 +46,23 @@ operating point wired into `host_benchmark.py` and used for the on-device benchm
 
 ### On-device benchmark (`../mcu/firmware/gesture_c1j_U5_board/bench_*.json`)
 
-Real board runs over Jester val subsets, S1 @ 0.85 / mf 5:
+Real board runs over **small Jester test subsets** (the board is fed clips one at a
+time over UART, so these are sized for turnaround, not full coverage), S1 @ 0.85 / mf 5:
 
 | Bench | clips | Accuracy | Mean exit frame | Mean obs. ratio |
 |---|---|---|---|---|
 | bench_10  | 10  | 80.0 % | 5.20 | 0.775 |
 | bench_100 | 100 | 84.0 % | 5.27 | 0.784 |
 | bench_128 | 128 | **84.4 %** | 5.23 | 0.778 |
+
+> **Sample-size caveat — not directly comparable to the 86.49 % figure.** The
+> **84.4 %** here is on the **largest on-device run of 128 clips**. The **86.49 %**
+> quoted elsewhere is the **full 14,787-clip** evaluation (no early exit). The 128-clip
+> on-device number carries large sampling variance (±~6 pp at n=128) and additionally
+> reflects the early-exit drop and the streaming-vs-clip INT8 export, so the ~2 pp gap
+> is expected and the two numbers must not be read as a regression. A full-set on-device
+> run is left as future work (it needs the firmware-side exit decision to avoid streaming
+> all 14,787 clips over UART).
 
 **Measured latency: ~141 ms/frame** of pure compute (≈22.6 M Cortex-M33 cycles @
 160 MHz, from DWT) — within the 150 ms/frame budget. With early exit at ~5.2 frames
