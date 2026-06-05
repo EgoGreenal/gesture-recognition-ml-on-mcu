@@ -23,7 +23,19 @@ Current contents:
 - `docs/TRAINING.md`
   - Three-stage TAKD pipeline (Super Teacher → TA → Path-C student) + quantization.
 - `docs/EARLY_EXIT.md`
-  - Host-side early-exit strategies (S1/S3) and selected operating points.
+  - Early-exit strategies (S1/S3), deployed operating point, on-device benchmark.
+- `docs/SERVER_TRAINING.md`
+  - SLURM / Leonardo job inventory and conventions.
+- `docs/MODEL_ARTIFACTS.md`
+  - What is committed under `models/selected_deployable/` and how the pieces relate.
+- `docs/STEDGEAI_DEPLOYMENT.md`
+  - ST Edge AI Core INT8 C-code generation flow (U5 analog of MAX78000 AI8X_DEPLOYMENT).
+- `docs/MCU_FIRMWARE.md`
+  - On-device firmware (`C1j-ai-v2`): streaming inference, UART protocol, measured latency.
+- `docs/HOST_DEMO.md`
+  - Host-side UART harness (`host_benchmark.py` / `host_frame_test.py`); no live camera.
+- `docs/TRAINING_HISTORY_SUMMARY.md`
+  - Narrative of the V-line and C1-line model history (text form of the result CSVs).
 - `docs/WORKFLOW.md`
   - Compact end-to-end summary of the STM32U5 training-to-deployment flow derived from the project plan.
 - `docs/tsm_probe_results.md`

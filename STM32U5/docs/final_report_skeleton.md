@@ -6,7 +6,7 @@
 ---
 
 ## TL;DR (报告 1 段, 50 words)
-在 STM32U5 (B-U585I-IOT02A, Cortex-M33 @ 160 MHz, 786 KB SRAM, 2 MB Flash) 上部署了一个实时手势识别系统：27-class Jester，部署模型 C1j streaming INT8。无早退 INT8 baseline（full val 14787）86.49%；板上实测（firmware C1j-ai-v2 流式 `ai_streaming_step` + 早退 S1 mf=5 thresh=0.85，平均 obs 0.778，n=128）accuracy 84.4%。**实测延迟 ~141 ms/frame**（DWT 实测，<150 ms/frame budget 通过），~880 ms/clip（含 4 KB/帧 UART 传输）；注意离线 X-CUBE-AI 估算 ~32–70 ms/frame 偏低 2–4×。Flash 0.99 MB / SRAM 261 KB。教师 → TA → student 三阶段 KD 蒸馏 (TAKD) + 17 层 TSM-MBV2 cone 截断 (w=0.5) + per-channel symmetric INT8 PTQ + min_exit_frame 约束早退。所有 U5 硬约束均通过（Flash<2MB / SRAM<600KB / lat<150ms/frame）。
+在 STM32U5 (B-U585I-IOT02A, Cortex-M33 @ 160 MHz, 786 KB SRAM, 2 MB Flash) 上部署了一个实时手势识别系统：27-class Jester，部署模型 C1j streaming INT8。无早退 INT8 baseline（full val 14787）86.49%；板上实测（firmware C1j-ai-v2 流式 `ai_streaming_step` + 早退 S1 mf=5 thresh=0.85，平均 obs 0.778，n=128）accuracy 84.4%。**实测延迟 ~141 ms/frame**（DWT 实测，<150 ms/frame budget 通过），~880 ms/clip（纯 compute，~6.2 帧；bench 按 inference cycle 计，不含 UART 线时）；注意离线 X-CUBE-AI 估算 ~32–70 ms/frame 偏低 2–4×。Flash 0.99 MB / SRAM 261 KB。教师 → TA → student 三阶段 KD 蒸馏 (TAKD) + 17 层 TSM-MBV2 cone 截断 (w=0.5) + per-channel symmetric INT8 PTQ + min_exit_frame 约束早退。所有 U5 硬约束均通过（Flash<2MB / SRAM<600KB / lat<150ms/frame）。
 
 ---
 
@@ -94,7 +94,7 @@ PTQ 表现明显好于 Plan 预期（预期 1-3 pp，实际 ≤ 0.33 pp）。原
 | 平均 frame count | 6.2 / 8 |
 | 离线估算 lat/clip | 199 ms（X-CUBE-AI 估算，偏低）|
 | **实测 lat/frame (DWT)** | **~141 ms/frame**（<150 budget 通过）|
-| **实测 lat/clip (含 UART)** | **~880 ms**（板上 bench, n=128, S1 mf5 thr0.85）|
+| **实测 lat/clip (compute)** | **~880 ms**（板上 bench, n=128, ~6.2 帧；不含 UART）|
 | 实测 on-device acc (n=128) | 84.4% |
 | C1j INT8 Flash | 0.99 MB |
 | C1j SRAM | 261 KB |
@@ -125,7 +125,7 @@ PTQ 表现明显好于 Plan 预期（预期 1-3 pp，实际 ≤ 0.33 pp）。原
 8. **GPU/算力预算**：项目用 ~42 GPU-hr（Plan 100 GPU-hr 预算保留 ~58）
 
 ## 10. 结论与未来工作
-- 实现了 STM32U5 上 27-class 实时手势识别：C1j streaming INT8，no-exit full-val baseline 86.49–86.69%，板上实测（S1 mf=5 thr=0.85）on-device acc 84.4%（n=128），**实测 ~141 ms/frame（<150 budget 通过）**、~880 ms/clip（含 UART）、Flash 0.99 MB
+- 实现了 STM32U5 上 27-class 实时手势识别：C1j streaming INT8，no-exit full-val baseline 86.49–86.69%，板上实测（S1 mf=5 thr=0.85）on-device acc 84.4%（n=128），**实测 ~141 ms/frame（<150 budget 通过）**、~880 ms/clip（纯 compute，不含 UART）、Flash 0.99 MB
 - 早退策略 mf=5 + S1=0.85：平均 obs 0.778（exit frame ~5.2，即观察 ~6.2/8 帧），相对 no-exit 省 ~22% 帧数 / 推理时间
 - 未来方向：
   - 真正的 QAT（如能 flat-inline 重建 C1 模型避开 tfmot bug）

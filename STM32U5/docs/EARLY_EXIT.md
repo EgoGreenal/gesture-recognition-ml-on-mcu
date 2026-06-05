@@ -65,8 +65,10 @@ time over UART, so these are sized for turnaround, not full coverage), S1 @ 0.85
 > all 14,787 clips over UART).
 
 **Measured latency: ~141 ms/frame** of pure compute (≈22.6 M Cortex-M33 cycles @
-160 MHz, from DWT) — within the 150 ms/frame budget. With early exit at ~5.2 frames
-the per-clip wall time is ~880 ms including the 4 KB/frame UART transfer.
+160 MHz, from DWT) — within the 150 ms/frame budget. With early exit at ~6.2 observed
+frames the per-clip **compute** time is ~880 ms. (This is cycle-based and **excludes
+UART wire time by design** — `host_benchmark.py` measures inference cycles only; the
+4 KB/frame UART transfer is test-harness overhead, not part of a real deployment.)
 
 > **Estimated vs measured.** The offline X-CUBE-AI per-frame estimate (≈32–70 ms/frame
 > in `../results/model_training_summary.csv` / `path_selection/`) under-predicted real

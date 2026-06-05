@@ -81,8 +81,8 @@
 - [ ] 验证 cmsis-nn / Helium SIMD 是否 active：build log 应该出现 `cmsis-nn` 优化字样；如果没有，CubeMX → X-CUBE-AI → Optimization 选 "Balanced (cmsis-nn)"
 
 > **实测结果（已完成，覆盖上面估算）**：板上实测 **~141 ms/frame**（远超上面 ~50 ms 估算；
-> 有效 Helium INT8 吞吐 ~57 MMAC/s 而非假设的 ~300）。per-clip ~880 ms（含 UART，S1 mf=5
-> thresh=0.85，avg ~5.2 frames）。**per-frame 仍在 150 ms/frame 硬预算内**，但 per-clip 远高于
+> 有效 Helium INT8 吞吐 ~57 MMAC/s 而非假设的 ~300）。per-clip ~880 ms（纯 compute，
+> 不含 UART 线时；S1 mf=5 thresh=0.85，avg ~6.2 观察帧）。**per-frame 仍在 150 ms/frame 硬预算内**，但 per-clip 远高于
 > 上面的 ≤400/≤310 ms 目标。权威数字见 [`../results/bench_summary.csv`](../results/bench_summary.csv)
 > 与 [EARLY_EXIT.md](EARLY_EXIT.md)。
 

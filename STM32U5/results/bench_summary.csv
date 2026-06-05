@@ -1,4 +1,4 @@
-bench,model,strategy,threshold,min_exit_frame,n_clips,accuracy_percent,mean_exit_frame,mean_obs_ratio,ms_per_frame_compute,ms_per_clip_wall,sysclk_mhz
+bench,model,strategy,threshold,min_exit_frame,n_clips,accuracy_percent,mean_exit_frame,mean_obs_ratio,ms_per_frame_compute,ms_per_clip_compute,sysclk_mhz
 bench_10,C1j_streaming_int8,S1_maxsoftmax,0.85,5,10,80.0,5.2,0.775,141.3,876.3,160
 bench_100,C1j_streaming_int8,S1_maxsoftmax,0.85,5,100,84.0,5.27,0.784,141.3,886.2,160
 bench_128,C1j_streaming_int8,S1_maxsoftmax,0.85,5,128,84.38,5.23,0.778,141.3,880.1,160
