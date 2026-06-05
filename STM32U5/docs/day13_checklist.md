@@ -1,106 +1,112 @@
-# Day 13 部署 Checklist — C1j INT8 streaming on STM32U5 (B-U585I-IOT02A)
+# Day 13 Deployment Checklist — C1j INT8 streaming on STM32U5 (B-U585I-IOT02A)
 
-**目标**：不做 live camera demo。Host PC 通过 UART 喂 Jester val INT8 帧到 U5，U5 跑 multi-input streaming ai_run + S1 mf=5 thresh=0.85 早退，UART 回 (pred, exit_frame, cycles)；Host 统计端到端 INT8 acc + 实测 lat。验证目标：
-1. INT8 acc 与 host-side TFLite Interpreter 一致（**86.49% baseline / 86.69% with S1 mf=5 thresh=0.85**）
-2. 实测 per-frame lat ≤ 150 ms（Plan budget）
-3. Flash + SRAM 实测占用与 Day 12.5 stedgeai generate 报告一致（**723 KB Flash / 68 KB SRAM**）
+**Goal**: no live-camera demo. The host PC feeds Jester val INT8 frames to the U5 over
+UART; the U5 runs the multi-input streaming `ai_run` + S1 mf=5 thresh=0.85 early exit and
+returns `(pred, exit_frame, cycles)` over UART; the host computes end-to-end INT8 accuracy
++ measured latency. Validation targets:
+1. INT8 accuracy agrees with the host-side TFLite Interpreter (**86.49% baseline / 86.69% with S1 mf=5 thresh=0.85**)
+2. Measured per-frame latency ≤ 150 ms (Plan budget)
+3. Measured Flash + SRAM usage matches the Day 12.5 stedgeai generate report (**723 KB Flash / 68 KB SRAM**)
 
 ---
 
-## 准备 (~30 min)
+## Preparation (~30 min)
 
-- [ ] 拿到 B-U585I-IOT02A 板子 + USB Type-C 线 (ST-LINK V3)
-- [ ] 装 STM32CubeIDE（Win/Mac/Linux 都可；最新版 ≥ 1.14）
-- [ ] 装 X-CUBE-AI 9.1+ extension（CubeIDE → Help → Manage Embedded Software Packages → STMicroelectronics → X-CUBE-AI）
-- [ ] 装 ST-LINK V3 driver（板子第一次连电脑会装）
-- [ ] 装 PuTTY / minicom / pyserial（host 端串口工具）
-- [ ] 把 `tools/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/` 拷贝到本地（或者用 CubeIDE 自带的 toolchain，无需手装）
-- [ ] **拷贝项目部署文件到本地**：
-  - `models/student_C1J/deploy/C1j_ptq_streaming_sm_int8.tflite`（X-CUBE-AI 重 generate 用）
-  - 或者：整个 `models/student_C1J/deploy/stedgeai_generate_int8/` 目录（含 5 个 generated C 文件 + network_data.c）
-  - `deploy/main_template.c`（本目录）
-  - `deploy/host_send_jester.py`（本目录）
+- [ ] Get a B-U585I-IOT02A board + USB Type-C cable (ST-LINK V3)
+- [ ] Install STM32CubeIDE (Win/Mac/Linux; latest ≥ 1.14)
+- [ ] Install the X-CUBE-AI 9.1+ extension (CubeIDE → Help → Manage Embedded Software Packages → STMicroelectronics → X-CUBE-AI)
+- [ ] Install the ST-LINK V3 driver (installs on first board connect)
+- [ ] Install PuTTY / minicom / pyserial (host serial tools)
+- [ ] Copy `tools/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/` locally (or use the toolchain bundled with CubeIDE, no manual install needed)
+- [ ] **Copy the project deployment files locally**:
+  - `models/student_C1J/deploy/C1j_ptq_streaming_sm_int8.tflite` (for X-CUBE-AI re-generate)
+  - or: the whole `models/student_C1J/deploy/stedgeai_generate_int8/` dir (5 generated C files + network_data.c)
+  - `deploy/main_template.c` (this directory)
+  - `deploy/host_send_jester.py` (this directory)
 
-## STM32CubeIDE 工程创建 (1-2 hr)
+## STM32CubeIDE project creation (1-2 hr)
 
-- [ ] **File → New → STM32 Project** → 选 Board Selector → search "B-U585I-IOT02A" → Next → Project Name e.g. "gesture_c1j" → Targeted Language: C → Finish
-- [ ] 接受 default initialization for all peripherals (CubeMX)
-- [ ] **配置 UART1**（数据流，向 host 收/发 4096-byte 帧数据）：CubeMX Pinout View → Connectivity → USART1 → Mode: Asynchronous, baud rate 921600（**注意**：默认 115200 太慢，4096 bytes × T=8 frames × 100 sample = 3.2 MB；115200 baud = ~11.5 KB/s = 280 秒/sample 测试集，太慢；921600 baud = ~92 KB/s = 35 秒/sample 测试集；2000000 baud 更好，但 U5 PCLK 看是否支持）
-- [ ] **配置 USART2**（debug printf 输出，连接 ST-LINK virtual COM）：通常默认已开
-- [ ] **配置 DCMI**: 禁用（不用 camera）
-- [ ] **生成代码** → Project → Generate Code
+- [ ] **File → New → STM32 Project** → Board Selector → search "B-U585I-IOT02A" → Next → Project Name e.g. "gesture_c1j" → Targeted Language: C → Finish
+- [ ] Accept default initialization for all peripherals (CubeMX)
+- [ ] **Configure UART1** (data stream, receive/send 4096-byte frame data to/from host): CubeMX Pinout View → Connectivity → USART1 → Mode: Asynchronous, baud rate 921600 (**note**: the default 115200 is too slow — 4096 bytes × T=8 frames × 100 samples = 3.2 MB; 115200 baud = ~11.5 KB/s = 280 s/sample test set, too slow; 921600 baud = ~92 KB/s = 35 s/sample test set; 2000000 baud is better if the U5 PCLK supports it)
+- [ ] **Configure USART2** (debug printf output, to the ST-LINK virtual COM): usually on by default
+- [ ] **Configure DCMI**: disable (no camera)
+- [ ] **Generate code** → Project → Generate Code
 
-## X-CUBE-AI 集成 (1 hr)
+## X-CUBE-AI integration (1 hr)
 
-**方案 A**（推荐）：直接用 Day 12.5 已 generate 的 C 代码：
-- [ ] 把 `models/student_C1J/deploy/stedgeai_generate_int8/` 下 5 个 `.h/.c` + `LICENSE.txt` 拷到 CubeIDE 工程 `Application/User/X-CUBE-AI/App/` 下
-- [ ] **重要**：CubeIDE 的 X-CUBE-AI 版本必须能链接 ST Edge AI Core 4.0 生成的 `stai_*` API（应该 X-CUBE-AI 9.1+ 都支持，未确认）
-- [ ] 在 CubeIDE 工程加 include path：`Application/User/X-CUBE-AI/App/`
+**Option A** (recommended): use the C code already generated on Day 12.5:
+- [ ] Copy the 5 `.h/.c` + `LICENSE.txt` under `models/student_C1J/deploy/stedgeai_generate_int8/` into the CubeIDE project's `Application/User/X-CUBE-AI/App/`
+- [ ] **Important**: the CubeIDE X-CUBE-AI version must be able to link the `stai_*` API produced by ST Edge AI Core 4.0 (X-CUBE-AI 9.1+ should support it, unconfirmed)
+- [ ] Add the include path to the CubeIDE project: `Application/User/X-CUBE-AI/App/`
 
-**方案 B**（fallback）：让 CubeIDE 内的 X-CUBE-AI 重新跑一遍 INT8 TFLite：
+**Option B** (fallback): let the in-CubeIDE X-CUBE-AI re-run the INT8 TFLite:
 - [ ] CubeMX → Software Packs → X-CUBE-AI → enable, mode "Add network"
 - [ ] Add network → Model: TFLite → Browse → `C1j_ptq_streaming_sm_int8.tflite`
 - [ ] Compression: lossless, Optimization: balanced
-- [ ] Analyze → 验证数字匹配 Day 12.5 (macc 7.59M / weights 723 KB / activations 68 KB)
+- [ ] Analyze → verify the numbers match Day 12.5 (macc 7.59M / weights 723 KB / activations 68 KB)
 - [ ] Generate Code
 
-## main.c 集成（复制 main_template.c）(2-3 hr)
+## main.c integration (from main_template.c) (2-3 hr)
 
-- [ ] 用 `deploy/main_template.c` 替换 CubeIDE 生成的 `Core/Src/main.c`（保留 USER CODE BEGIN/END 区域里的 CubeMX init 代码）
-- [ ] 修改 `#include` 路径让它能找到 `student_c1j_ptq_int8.h` 等 generated headers
-- [ ] **验证 STM32U5 system clock = 160 MHz max**（CubeMX → Clock Configuration → SYSCLK = 160 MHz；如果是 80 MHz 改成 160）
-- [ ] Build → 应该 0 error 0 warning
-- [ ] Flash 占用应该是 ~723 KB weights + ~50 KB code = ~780 KB / 2 MB = **39%**
-- [ ] SRAM 占用应该是 ~68 KB activations + ~10 KB stack/heap/UART buf = ~78 KB / 786 KB = **10%**
+- [ ] Replace the CubeIDE-generated `Core/Src/main.c` with `deploy/main_template.c` (keep the CubeMX init code inside the USER CODE BEGIN/END regions)
+- [ ] Fix the `#include` paths so it finds `student_c1j_ptq_int8.h` and the other generated headers
+- [ ] **Verify the STM32U5 system clock = 160 MHz max** (CubeMX → Clock Configuration → SYSCLK = 160 MHz; if it is 80 MHz, change it to 160)
+- [ ] Build → should be 0 error, 0 warning
+- [ ] Flash usage should be ~723 KB weights + ~50 KB code = ~780 KB / 2 MB = **39%**
+- [ ] SRAM usage should be ~68 KB activations + ~10 KB stack/heap/UART buf = ~78 KB / 786 KB = **10%**
 
-## 第一次烧板 + 串口连接验证 (0.5-1 hr)
+## First flash + serial-link verification (0.5-1 hr)
 
-- [ ] CubeIDE → Run → 选 ST-LINK，烧
-- [ ] 打开 PuTTY / minicom：ST-LINK virtual COM (USART2)，baud 115200
-- [ ] 板上 Reset → 看到 "MLonMCU gesture recognition ready"
-- [ ] 板子的 USART1 通过 USB-UART 桥（或者直接用 STLink V3 的 secondary UART pin）连到 host
+- [ ] CubeIDE → Run → select ST-LINK, flash
+- [ ] Open PuTTY / minicom: ST-LINK virtual COM (USART2), baud 115200
+- [ ] Reset the board → see "MLonMCU gesture recognition ready"
+- [ ] Connect the board's USART1 to the host via a USB-UART bridge (or the ST-LINK V3 secondary UART pin)
 
-## Host-side INT8 accuracy 验证 (1-2 hr)
+## Host-side INT8 accuracy verification (1-2 hr)
 
-- [ ] 在 host 上：`python deploy/host_send_jester.py --port /dev/ttyUSB0 --baud 921600 --n_samples 100`
-- [ ] 跑 100 个 Jester val sample，对比 host TFLite Interpreter 预测
-- [ ] **acceptance**: agreement rate ≥ 99%（INT8 推理在 host vs board 应该 bit-exact，因为 cmsis-nn 用 int8 算）
-- [ ] 如果 disagreement 多，检查：
-  - input frame quantization scale 是否与 IN_1_SCALE=0.00784 / ZP=-1 一致
-  - cache buffer mapping 是否正确（参考 main_template.c 里的 CACHE_PAIRS table）
-  - 第一帧 cache 是否初始化为 zp 而非 0（int8 zero point shift）
+- [ ] On the host: `python deploy/host_send_jester.py --port /dev/ttyUSB0 --baud 921600 --n_samples 100`
+- [ ] Run 100 Jester val samples, compare against the host TFLite Interpreter predictions
+- [ ] **acceptance**: agreement rate ≥ 99% (INT8 inference should be bit-exact host vs board, since cmsis-nn computes in int8)
+- [ ] If many disagreements, check:
+  - the input frame quantization scale matches IN_1_SCALE=0.00784 / ZP=-1
+  - the cache buffer mapping is correct (see the CACHE_PAIRS table in main_template.c)
+  - the first-frame cache is initialized to zp, not 0 (int8 zero-point shift)
 
-## 实测延迟 profile (0.5-1 hr)
+## Measured latency profile (0.5-1 hr)
 
-- [ ] DWT cycle counter 在 main_template.c 里已经接好，每帧 ai_run 前后读 DWT->CYCCNT
-- [ ] Host 收到 "cycles=N" → 打印 ms = N / 160e6 × 1000
-- [ ] Pareto budget check：
-  - per-frame lat ≤ ~50 ms (Plan 估算 32ms 是 300 MHz 公式；160 MHz 实际 ~50-80 ms 可接受)
+- [ ] The DWT cycle counter is already wired in main_template.c; read DWT->CYCCNT around each frame's ai_run
+- [ ] Host receives "cycles=N" → print ms = N / 160e6 × 1000
+- [ ] Pareto budget check:
+  - per-frame lat ≤ ~50 ms (Plan estimate 32ms is the 300 MHz formula; ~50-80 ms at 160 MHz is acceptable)
   - per-clip (T=8, no early-exit) ≤ ~400 ms
   - per-clip with S1 mf=5 thresh=0.85 (avg 6.2 frames): ≤ ~310 ms
-- [ ] 验证 cmsis-nn / Helium SIMD 是否 active：build log 应该出现 `cmsis-nn` 优化字样；如果没有，CubeMX → X-CUBE-AI → Optimization 选 "Balanced (cmsis-nn)"
+- [ ] Verify cmsis-nn / Helium SIMD is active: the build log should show `cmsis-nn` optimisation; if not, CubeMX → X-CUBE-AI → Optimization → "Balanced (cmsis-nn)"
 
-> **实测结果（已完成，覆盖上面估算）**：板上实测 **~141 ms/frame**（远超上面 ~50 ms 估算；
-> 有效 Helium INT8 吞吐 ~57 MMAC/s 而非假设的 ~300）。per-clip ~880 ms（纯 compute，
-> 不含 UART 线时；S1 mf=5 thresh=0.85，avg ~6.2 观察帧）。**per-frame 仍在 150 ms/frame 硬预算内**，但 per-clip 远高于
-> 上面的 ≤400/≤310 ms 目标。权威数字见 [`../results/bench_summary.csv`](../results/bench_summary.csv)
-> 与 [EARLY_EXIT.md](EARLY_EXIT.md)。
+> **Measured result (done, supersedes the estimates above)**: the board measured
+> **~141 ms/frame** (far above the ~50 ms estimate; effective Helium INT8 throughput
+> ~57 MMAC/s, not the assumed ~300). per-clip ~880 ms (pure compute, **excluding UART
+> wire time**; S1 mf=5 thresh=0.85, avg ~6.2 observed frames). **per-frame is still
+> within the 150 ms/frame hard budget**, but per-clip is well above the ≤400/≤310 ms
+> targets above. Authoritative numbers in
+> [`../results/bench_summary.csv`](../results/bench_summary.csv) and
+> [EARLY_EXIT.md](EARLY_EXIT.md).
 
-## 整理 Day 13 entry 写到 Project_Plan_ch.md
+## Write the Day 13 entry into Project_Plan_ch.md
 
-- [ ] 真实 Flash / SRAM 占用 (CubeIDE Build Log 报)
-- [ ] 真实 per-frame / per-clip lat (DWT 数字 × 1000 / 160e6 ms)
+- [ ] Real Flash / SRAM usage (from the CubeIDE build log)
+- [ ] Real per-frame / per-clip latency (DWT cycles × 1000 / 160e6 ms)
 - [ ] 100-sample agreement rate
-- [ ] 如有，踩坑笔记（X-CUBE-AI 版本 mismatch / cmsis-nn off / cache 初始化错 / baud rate 不够等）
+- [ ] Any gotcha notes (X-CUBE-AI version mismatch / cmsis-nn off / wrong cache init / insufficient baud rate, etc.)
 
 ---
 
-## 风险残量 + Fallback
+## Residual risks + fallbacks
 
-| 风险 | Fallback |
+| Risk | Fallback |
 |---|---|
-| **CubeIDE 自带 X-CUBE-AI 版本不支持 ST Edge AI Core 4.0 API**（`stai_*` 函数找不到 link symbol）| 用方案 B：CubeIDE 内 X-CUBE-AI 重新 generate（产生 `ai_*` 旧 API），同步把 main_template.c 里 `stai_*` 替换为 `ai_*`（两套 API 等价，函数名映射可对照 Day 12.5 generated header） |
-| **921600 baud 在 USART1 不稳，丢字节** | 降到 460800 或加流控（RTS/CTS）；接受测试时间翻倍 |
-| **cache mapping 错（看 host vs board 推理结果不一致）** | main_template.c 里 print 每个 IN/OUT 的 `scale + zp + shape` 在 init 时，与 `student_c1j_ptq_int8.h` 里的 IN_n_SCALE / OUT_n_SCALE 对比，看哪个 OUT 实际对应 IN_n（理论上 scale+shape 匹配的就是 cache pair） |
-| **实测 lat > 150 ms/frame budget** | 检查 cmsis-nn 是否 active；若 active 还慢，回退到 C1f → C1j 已经是 deploy-friendly variant，应该没问题 |
-| **INT8 agreement < 99%（host vs board 推理不一致）** | 大概率是 quantization 边界处理 / 第一帧 cache init 错。逐 layer 比 host TFLite Interpreter vs board ai_run intermediate output（X-CUBE-AI Validation tool 支持） |
+| **The bundled CubeIDE X-CUBE-AI version does not support the ST Edge AI Core 4.0 API** (`stai_*` functions have no link symbol) | Use Option B: re-generate inside CubeIDE's X-CUBE-AI (produces the older `ai_*` API), and replace `stai_*` with `ai_*` in main_template.c (the two APIs are equivalent; the name mapping is in the Day 12.5 generated header) |
+| **921600 baud unstable on USART1, drops bytes** | Drop to 460800 or add flow control (RTS/CTS); accept doubled test time |
+| **Wrong cache mapping (host vs board inference results differ)** | Have main_template.c print each IN/OUT `scale + zp + shape` at init and compare against IN_n_SCALE / OUT_n_SCALE in `student_c1j_ptq_int8.h` to find which OUT actually maps to which IN_n (the cache pair is the one whose scale+shape match) |
+| **Measured lat > 150 ms/frame budget** | Check whether cmsis-nn is active; if it is active and still slow, fall back C1f → C1j is already a deploy-friendly variant, should be fine |
+| **INT8 agreement < 99% (host vs board inference differ)** | Most likely a quantization-boundary or first-frame cache-init bug. Compare host TFLite Interpreter vs board ai_run intermediate output layer by layer (the X-CUBE-AI Validation tool supports this) |

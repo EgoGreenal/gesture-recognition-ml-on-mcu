@@ -1,14 +1,15 @@
-# Day 8 TSM 部署路径探针实验报告
+# Day 8 TSM Deployment-Path Probe Report
 
-**日期**: 2026-05-12
-**目标**: 决定 Day 13 部署路径 — Path A.streaming（单 TFLite + cache-as-IO）vs Path B（multi-network fallback）
-**结论**: ✅ **Path A.streaming — GO**（A.streaming 主路径，Day 9-10 训练全部 7 个 variant V0-V6 都可推进）
+**Date**: 2026-05-12
+**Goal**: Decide the Day 13 deployment path — Path A.streaming (single TFLite + cache-as-IO) vs Path B (multi-network fallback)
+**Verdict**: ✅ **Path A.streaming — GO** (A.streaming is the primary path; all 7 Day 9-10 variants V0-V6 can proceed)
 
 ---
 
-## 探针模型设计
+## Probe model design
 
-最小可行 streaming student（**故意做小**，只为验证拓扑 + 量化通路；不是 student variant 候选）：
+Minimal viable streaming student (**deliberately tiny** — only to validate the topology
++ quantization path; not a student-variant candidate):
 
 ```
 frame_in [1, 32, 32, 1]                                ch=1   spatial 32x32
@@ -29,48 +30,58 @@ frame_in [1, 32, 32, 1]                                ch=1   spatial 32x32
 [logits, cache_0_out, cache_1_out]
 ```
 
-**关键设计点**:
-- 输入通道选取保证 `n_shift = C / n_div = C/8` 在每个 TSM 边界都是整数（8/8=1, 16/8=2）— 避免 TFLite Slice 量化 scale 不齐的 corner case
-- 每个 `Conv → BN → ReLU` 三元组结尾是 ReLU，TSM cut 点在 ReLU 之后 — 满足 Plan Day 8 "BN folding 边界规则"
-- TSM shift 用纯 `tf.split + tf.concat` 实现，不需要 custom op
+**Key design points**:
+- Input channels are chosen so that `n_shift = C / n_div = C/8` is an integer at every
+  TSM boundary (8/8=1, 16/8=2) — avoids the TFLite Slice quantization scale-misalignment
+  corner case.
+- Each `Conv → BN → ReLU` triple ends with ReLU, and the TSM cut point is after the ReLU
+  — satisfies the Plan Day 8 "BN folding boundary rule".
+- TSM shift is implemented with pure `tf.split + tf.concat`, no custom op needed.
 
-详见 [scripts/tsm_streaming_layer.py](scripts/tsm_streaming_layer.py) + [scripts/tsm_probe.py](scripts/tsm_probe.py)。
+See [../training/core/tsm_streaming_layer.py](../training/core/tsm_streaming_layer.py) +
+[../training/core/tsm_probe.py](../training/core/tsm_probe.py).
 
 ---
 
-## Check 1 — INT8 量化保真度
+## Check 1 — INT8 quantization fidelity
 
-**目标**: FP32 Keras 模型 → INT8 TFLite (post-training quantization) 后输出分布偏差 < KL 0.05
+**Goal**: after FP32 Keras → INT8 TFLite (post-training quantization), the output
+distribution should deviate by < KL 0.05.
 
-**流程**:
+**Procedure**:
 1. Keras model → `tf.saved_model.save` → `tf.lite.TFLiteConverter.from_saved_model`
-2. `representative_dataset` 用 dict-keyed yield（多输入模型 calibrator 输入顺序坑）
-3. `target_spec.supported_ops = [TFLITE_BUILTINS_INT8]` + `inference_input_type = INT8` + `inference_output_type = INT8` → fully quantized I/O
-4. 32 个随机 [-1, 1] uniform 样本，每个跑 FP32 Keras + INT8 TFLite Interpreter，对比 logits 的 softmax KL
+2. `representative_dataset` yields dict-keyed samples (multi-input calibrator input-order pitfall)
+3. `target_spec.supported_ops = [TFLITE_BUILTINS_INT8]` + `inference_input_type = INT8` +
+   `inference_output_type = INT8` → fully quantized I/O
+4. 32 random [-1, 1] uniform samples, each run through FP32 Keras + the INT8 TFLite
+   Interpreter, comparing the softmax KL of the logits
 
-**结果**:
+**Results**:
 
-| 指标 | 值 | 评注 |
+| Metric | Value | Note |
 |---|---|---|
 | samples | 32 | |
-| KL(FP32 ‖ INT8) | **0.000001** | 阈值 < 0.05 ✓ |
-| KL(INT8 ‖ FP32) | 0.000001 | 对称对照 |
-| argmax 一致率 | **1.0000** | 全部 32 个样本预测一致 |
+| KL(FP32 ‖ INT8) | **0.000001** | threshold < 0.05 ✓ |
+| KL(INT8 ‖ FP32) | 0.000001 | symmetric check |
+| argmax agreement | **1.0000** | all 32 samples predict identically |
 
 **verdict: PASS** ✓
 
-注：模型未训练（随机初始化），输出 logits 接近均匀分布，量化几乎没东西可丢。**这里验证的是拓扑 + 量化通路本身**，不是精度。真实 student variant 训完后 INT8 KL 应该上升但仍远低于 0.05（Day 11 QAT 还会再压一次）。
+Note: the model is untrained (random init), so the output logits are near-uniform and
+quantization has almost nothing to lose. **What this validates is the topology + the
+quantization path itself**, not accuracy. A real trained student will see INT8 KL rise
+but stay well below 0.05 (Day 11 QAT tightens it again).
 
 ---
 
-## Check 2 — stedgeai analyze（X-CUBE-AI 多 I/O + ops 支持）
+## Check 2 — stedgeai analyze (X-CUBE-AI multi-I/O + op support)
 
-**目标**: ST Edge AI Core 4.0 (= STM32CubeAI 12.0) 能否：
-1. 接受多输入多输出 INT8 TFLite（3 inputs / 3 outputs）
-2. 把 TSM 的 STRIDED_SLICE + CONCATENATION 正确量化保真
-3. 给出 MAC / RAM / ROM 估算
+**Goal**: can ST Edge AI Core 4.0 (= STM32CubeAI 12.0):
+1. Accept a multi-input/multi-output INT8 TFLite (3 inputs / 3 outputs)?
+2. Quantize the TSM STRIDED_SLICE + CONCATENATION faithfully?
+3. Produce MAC / RAM / ROM estimates?
 
-**命令**:
+**Command**:
 ```bash
 stedgeai analyze \
     --model streaming_probe_int8.tflite \
@@ -81,104 +92,127 @@ stedgeai analyze \
     --verbosity 2
 ```
 
-**结果**:
+**Results**:
 
-| 指标 | 值 |
+| Metric | Value |
 |---|---|
-| stedgeai 版本 | ST Edge AI Core v4.0.0-20500 (STM32CubeAI 12.0.0) |
+| stedgeai version | ST Edge AI Core v4.0.0-20500 (STM32CubeAI 12.0.0) |
 | returncode | **0** ✓ |
-| multi-I/O 接受 | **True** ✓ |
-| 模型类型 | tflite (fully INT8, `ss/sa per channel`) |
-| 模型 hash | `0x96cc70c7739a60adb4adc6f87ad69071` |
+| multi-I/O accepted | **True** ✓ |
+| model type | tflite (fully INT8, `ss/sa per channel`) |
+| model hash | `0x96cc70c7739a60adb4adc6f87ad69071` |
 | params # | 6,752 items (**6.76 KiB**) |
 | inputs total | 1.38 KBytes (frame 1024 + cache_0 256 + cache_1 128) |
 | outputs total | 411 Bytes (logits 27 + cache_0_out 256 + cache_1_out 128) |
 | MACs | **170,419** |
-| weights (RO) | 7,028 B (**6.86 KiB**) — 比 FP32 模型 -74.0% |
+| weights (RO) | 7,028 B (**6.86 KiB**) — -74.0% vs the FP32 model |
 | activations (RW) | 11,136 B (**10.88 KiB**) |
-| RAM 总和 | 11,136 B (10.88 KiB) |
-| ROM (AI RT 代码) | 未给出（需要 `arm-none-eabi-gcc` 在 PATH 才能算 runtime 代码体积；Day 13 烧板前再装 ARM toolchain） |
-| 工具耗时 | 20.82 s |
-| analyze 进度 | 162/171 PASS（剩 9 项 skipped 因为没装 GCC） |
+| RAM total | 11,136 B (10.88 KiB) |
+| ROM (AI RT code) | not given (needs `arm-none-eabi-gcc` on PATH to size the runtime code; install the ARM toolchain before the Day 13 board flash) |
+| tool time | 20.82 s |
+| analyze progress | 162/171 PASS (remaining 9 skipped because GCC was not installed) |
 
 **verdict: PASS** ✓
 
-**stedgeai 输出节选**（关键拓扑被识别）:
+**stedgeai output excerpt** (the key topology is recognised):
 ```
 m_id   layer (original)                  oshape                 param/size    macc
 0      serving_default_frame_in0         [b:1,h:32,w:32,c:1]
        conv2d_0 (CONV_2D)                [b:1,h:16,w:16,c:8]    80/104         18,440
        nl_0_nl (CONV_2D)                 [b:1,h:16,w:16,c:8]                    2,048   <- ReLU as fused-conv
-1      slice_1 (STRIDED_SLICE)           [b:1,h:16,w:16,c:1]                            <- TSM cache 切
-2      slice_2 (STRIDED_SLICE)           [b:1,h:16,w:16,c:7]                            <- TSM static 切
-3      concat_3 (CONCATENATION)          [b:1,h:16,w:16,c:8]                            <- TSM 拼回
+1      slice_1 (STRIDED_SLICE)           [b:1,h:16,w:16,c:1]                            <- TSM cache slice
+2      slice_2 (STRIDED_SLICE)           [b:1,h:16,w:16,c:7]                            <- TSM static slice
+3      concat_3 (CONCATENATION)          [b:1,h:16,w:16,c:8]                            <- TSM re-join
 ...
 ```
 
-**关键发现**:
-1. **多 I/O 完全 OK**：3 inputs（frame + 2 cache）、3 outputs（logits + 2 cache_out）都被识别为正常张量，没有触发任何 op 不支持错误
-2. **TSM 的 SLICE/CONCAT 干净保留**：每个 TSM 边界分解为 `STRIDED_SLICE×2 + CONCATENATION×1`，stedgeai 把它们识别为标准 ops 并量化（per-channel ss/sa scale）
-3. **量化 scale 跨 SLICE/CONCAT 节点自动同步**：cache_0_in 和 cache_0_out 都是 `QLinear(0.008567031, -11, int8)` — scale + zero point 完全一致，意味着 cache buffer 在 C 端可以**直接 memcpy** 不需要 rescale
-4. **Plan section 3 要求 ≥ X-CUBE-AI 9.1（即 STM32CubeAI 9.x）**；实测装的 STM32CubeAI 12.0 是更新版本，op 支持更完整
+**Key findings**:
+1. **Multi-I/O fully OK**: 3 inputs (frame + 2 cache) and 3 outputs (logits + 2 cache_out)
+   are all recognised as normal tensors; no unsupported-op error triggered.
+2. **TSM SLICE/CONCAT preserved cleanly**: each TSM boundary decomposes into
+   `STRIDED_SLICE×2 + CONCATENATION×1`, which stedgeai recognises as standard ops and
+   quantizes (per-channel ss/sa scale).
+3. **Quantization scale auto-synced across SLICE/CONCAT nodes**: cache_0_in and cache_0_out
+   are both `QLinear(0.008567031, -11, int8)` — identical scale + zero point, meaning the
+   cache buffer can be **memcpy'd directly** in C with no rescale.
+4. **Plan section 3 requires ≥ X-CUBE-AI 9.1 (STM32CubeAI 9.x)**; the installed STM32CubeAI
+   12.0 is newer with more complete op support.
 
 ---
 
-## Check 3 — U5 板上 DWT 实测
+## Check 3 — on-board DWT measurement (U5)
 
-**状态**: **跳过**（HPC Leonardo 上无 U5 板）
+**Status**: **skipped** (no U5 board on HPC Leonardo at the time)
 
-**用估算公式代替**（Plan Section 5 修正公式）:
+**Replaced by the estimate formula** (Plan Section 5 corrected formula):
 ```
 latency_ms = MACs / 300e6 × 1000 + N_ai_run_calls × 5ms
 ```
 - Probe model MACs = 170,419 ≈ 0.17M
 - 8 frames × 1 ai_run/frame = 8 ai_run calls
-- 估算: `0.17M / 300M × 1000 + 8 × 5 = 0.6 + 40 = ~40.6 ms` for 8-frame clip
+- Estimate: `0.17M / 300M × 1000 + 8 × 5 = 0.6 + 40 = ~40.6 ms` for an 8-frame clip
 
-Probe model 是故意做小的，跑这点 latency 不代表 V0-V6 的真实数字。但 stedgeai 拿到的 MACs 是 **per-frame** 而不是 per-clip，对 Day 9-10 各 variant 跑同样 analyze 拿真实 MACs，再代入公式得每帧延迟。
+The probe model is deliberately tiny, so its latency does not represent the real V0-V6
+numbers. But the MACs stedgeai reports are **per-frame**, not per-clip; run the same
+analyze on each Day 9-10 variant to get real MACs, then plug into the formula for the
+per-frame latency.
+
+> **Update (Day 13):** the on-board measurement was later done on the deployed C1j
+> firmware — **~141 ms/frame**, ~2-4× higher than the 300 MMAC/s estimate above. The
+> estimate is a lower bound. See [EARLY_EXIT.md](EARLY_EXIT.md) and
+> [../results/bench_summary.csv](../results/bench_summary.csv).
 
 ---
 
-## 决策与下一步
+## Decision and next steps
 
-### 部署路径锁定: **Path A.streaming**
+### Deployment path locked: **Path A.streaming**
 
-Day 13 部署用单 TFLite + C 端 cache buffer 管理，单 `ai_run()` per frame，每帧 overhead 仅 ~5ms × 8 = 40ms。Multi-network fallback (Path B) **不需要训练 V0/V1 收缩**。
+Day 13 deployment uses a single TFLite + C-side cache buffer management, one `ai_run()`
+per frame, with only ~5 ms × 8 = 40 ms per-frame overhead. The multi-network fallback
+(Path B) is **not** needed, and V0/V1 do **not** need to be shrunk for it.
 
-### Day 9-10 variant 池放开到全 7 个
+### Day 9-10 variant pool opened to all 7
 
-按 Plan Section 5 表格，A.streaming 单 NN 路径下：
+Per the Plan Section 5 table, under the A.streaming single-NN path:
 
-| Variant | 估算 latency | 可行 |
+| Variant | Estimated latency | Feasible |
 |---|---|---|
 | V0 Ultra-Tiny | 140 ms | ✓ |
 | V1 Tiny | 97 ms | ✓ |
-| V2 Small | 307 ms | ⚠ 超 200ms |
-| V3 Small-DW | 190 ms | ✓ 边界 |
+| V2 Small | 307 ms | ⚠ over 200ms |
+| V3 Small-DW | 190 ms | ✓ borderline |
 | V4 Deep | 373 ms | ✗ |
 | V5 Wide | 973 ms | ✗ |
 | V6 HiRes | 473 ms | ✗ |
 
-实际跑训练时，估算可能 ±30%。Day 9-10 跑完 fp32 训练后，对每个 variant 都跑一次 `stedgeai analyze` 拿真 MACs / RAM，**用真实数字决定 Day 11 QAT top-3**。
+Real training estimates may be ±30%. After Day 9-10 FP32 training, run `stedgeai analyze`
+once per variant for real MACs / RAM, and **use the real numbers to pick the Day 11 QAT top-3**.
 
-### 不需要的 fallback 工作
-- ❌ 不需要 implement `block_exporter.py`（Path B 才需要的多 sub-network 切分）
-- ❌ 不需要在 block 边界插 identity FakeQuant + 自定义 `tfmot.QuantizeConfig`（QAT scale 一致性 — Path B 才需要）
-- ❌ 不需要写 `tsm_shift.c`（C 端 memcpy shift — Path B 才需要）
-- ✅ 仍然需要：student model factory + frame-level KD loss + 训练脚本
+### Fallback work not needed
+- ❌ No need to implement `block_exporter.py` (multi sub-network splitting — Path B only)
+- ❌ No need to insert identity FakeQuant + custom `tfmot.QuantizeConfig` at block
+  boundaries (QAT scale consistency — Path B only)
+- ❌ No need to write `tsm_shift.c` (C-side memcpy shift — Path B only)
+- ✅ Still needed: student model factory + frame-level KD loss + training scripts
 
 ---
 
-## Probe 工具产出
+## Probe tool outputs
 
-- [scripts/tsm_streaming_layer.py](scripts/tsm_streaming_layer.py) — TSMStreamingShift Keras layer + `causal_tsm_clip` clip-form helper（训练时用 clip-form，部署时 unroll 成 streaming step）
-- [scripts/tsm_probe.py](scripts/tsm_probe.py) — probe 全流程脚本（build → INT8 export → Interpreter cross-check → stedgeai analyze → JSON 报告）
-- `logs/tsm_probe/` — 完整产出目录：
+- [../training/core/tsm_streaming_layer.py](../training/core/tsm_streaming_layer.py) —
+  TSMStreamingShift Keras layer + `causal_tsm_clip` clip-form helper (clip-form for
+  training, unrolled into streaming steps for deployment)
+- [../training/core/tsm_probe.py](../training/core/tsm_probe.py) — full probe pipeline
+  (build → INT8 export → Interpreter cross-check → stedgeai analyze → JSON report)
+- `logs/tsm_probe/` — full output directory:
   - `streaming_probe_fp32.tflite` — 30.6 KB
   - `streaming_probe_int8.tflite` — 12.9 KB
-  - `saved_model/` — TF SavedModel 中间格式
-  - `stedgeai/workspace/` + `stedgeai/output/` — stedgeai 完整工作目录
-  - `stedgeai/analyze_log.txt` — stedgeai 完整运行日志
-  - `tsm_probe_results.json` — 机器可读结果摘要
-- [tools/stedgeai/4.0/](tools/stedgeai/4.0/) — ST Edge AI Core 4.0 (= STM32CubeAI 12.0) 完整安装树
-- [scripts/env_setup.sh](scripts/env_setup.sh) — 加了 `stedgeai` 到 PATH（append-not-prepend，避开 bundled python 3.9.13 shadow tf_env 的 3.11.7）
+  - `saved_model/` — TF SavedModel intermediate format
+  - `stedgeai/workspace/` + `stedgeai/output/` — full stedgeai working dir
+  - `stedgeai/analyze_log.txt` — full stedgeai run log
+  - `tsm_probe_results.json` — machine-readable result summary
+- `tools/stedgeai/4.0/` — full ST Edge AI Core 4.0 (= STM32CubeAI 12.0) install tree (not committed)
+- [../training/server_scripts/env_setup.sh](../training/server_scripts/env_setup.sh) —
+  adds `stedgeai` to PATH (append-not-prepend, to avoid the bundled python 3.9.13
+  shadowing tf_env's 3.11.7)

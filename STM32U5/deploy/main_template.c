@@ -53,7 +53,7 @@
  * INDICES ARE ZERO-BASED (the stai API returns arrays starting at index 0;
  * the IN_n / OUT_n macros in the header are 1-based).
  *
- * Verified via shape + scale match (see day13_checklist.md "cache mapping 错" row
+ * Verified via shape + scale match (see day13_checklist.md "wrong cache mapping" row
  * for verification procedure if board results disagree with host).
  */
 typedef struct {

@@ -60,8 +60,8 @@ C1_PRESETS = {
     "C1O": dict(width_mult=0.80, n_blocks=17, input_hw=64),
 }
 
-# C2 sub-variant id 直接传给 build_c2
-# C3 sub-variant id 直接传给 build_c3
+# C2 sub-variant id is passed straight to build_c2
+# C3 sub-variant id is passed straight to build_c3
 
 
 def get_spec(name: str) -> VariantSpec:

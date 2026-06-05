@@ -14,7 +14,7 @@ Training mirrors the FP32 path (train_student.py) but:
   - warmup_epochs = 0 (already warm)
   - load_fp32_weights = best.weights.h5 from Day 10
   - install_fake_quant_on_model() patches Conv/Dense to fake-quant on forward
-  - same KD loss + TA per-frame soft labels (per Plan: "继续用 TA per-frame 软标签做 KD")
+  - same KD loss + TA per-frame soft labels (per Plan: "keep using TA per-frame soft labels for KD")
   - same frame_weights [0.10, 0.20, 0.30, 0.40] + alpha=0.3 + T=4.0
 """
 from __future__ import annotations
