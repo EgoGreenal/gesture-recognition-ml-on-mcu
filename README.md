@@ -1,6 +1,6 @@
 # Gesture Recognition on MCUs
 
-This repository contains a final course project for real-time hand gesture recognition on resource-constrained microcontrollers. The current complete implementation targets the Analog Devices MAX78000, and the repository now also includes an STM32U5 deployment workspace with firmware entry code, host-side tooling, and bring-up documentation.
+This repository contains a final course project for real-time hand gesture recognition on resource-constrained microcontrollers. It contains two complete platform implementations: the Analog Devices **MAX78000** (CNN accelerator, ai8x toolchain, live-camera demo) and the **STM32U5** (Cortex-M33 + X-CUBE-AI, knowledge-distilled streaming model with on-device inference benchmarked on the board).
 
 The project studies the full embedded ML pipeline:
 
@@ -36,14 +36,16 @@ gesture-recognition-ml-on-mcu/
     deploy/
     docs/
     firmware/
+    mcu/
     models/
     results/
+    training/
     workspace/
 ```
 
 ## MAX78000 Implementation
 
-The MAX78000 part is the complete implementation in this repository:
+The MAX78000 part is a complete implementation with the richer host-side live-camera demo:
 
 - `MAX78000/training/`
   - Training, distillation, QAT, ai8x custom models/datasets/policies, server scripts, and experiment code.
@@ -68,22 +70,36 @@ MAX78000/README.md
 
 ## STM32U5 Implementation
 
-The `STM32U5/` directory now contains the STM32U5 deployment-side project material:
+The `STM32U5/` directory is a complete training-to-on-device implementation (the only
+parts not carried over from MAX78000 are the live-camera demo and the ai8x-specific
+custom files):
 
+- `STM32U5/training/`
+  - Full TAKD pipeline: data loaders, Super Teacher / TA / Path-C student model
+    definitions, KD losses, training/QAT/INT8-export scripts, and SLURM server scripts.
+- `STM32U5/mcu/firmware/gesture_c1j_U5_board/`
+  - Full STM32CubeIDE project (firmware `C1j-ai-v2`) running the deployed C1j streaming
+    INT8 model on the board, with X-CUBE-AI generated network, host benchmark scripts,
+    and on-device `bench_*.json` results.
 - `STM32U5/firmware/`
-  - STM32U5 firmware entry code (`main.c`) prepared for board-side integration.
+  - Earlier standalone smoke-test entry code (`C1j-smoke-v0`, board bring-up only),
+    superseded by the CubeIDE project above.
 - `STM32U5/deploy/`
   - Host-side UART tooling and deployment-oriented reference code.
 - `STM32U5/docs/`
-  - Bring-up checklist, probe notes, and a compact workflow summary for the STM32U5 board path.
+  - Install, training, server-training, model-artifacts, ST Edge AI deployment, MCU
+    firmware, host demo, early-exit, training-history, workflow, bring-up checklist, and
+    the final-report skeleton.
 - `STM32U5/models/`
   - Selected deployable TFLite artifacts and generated ST Edge AI C sources for the chosen U5 model.
 - `STM32U5/results/`
-  - Lightweight summaries for path selection, INT8 evaluation, early-exit sweeps, and ST Edge AI analysis.
+  - Summaries for path selection, INT8 evaluation, early-exit sweeps, ST Edge AI analysis,
+    training history, and the on-device benchmark (`bench_summary.csv`).
 - `STM32U5/workspace/`
   - Reserved workspace folders for ST Edge AI / STM32CubeIDE generated outputs.
 
-Start from:
+The deployed C1j streaming INT8 model runs on-device at a measured ~141 ms/frame (within
+the 150 ms/frame budget); see `STM32U5/docs/EARLY_EXIT.md`. Start from:
 
 ```text
 STM32U5/README.md
@@ -91,7 +107,7 @@ STM32U5/README.md
 
 ## Dataset
 
-The experiments use the 20BN-Jester v1 gesture dataset. The raw dataset is not included in this repository because of size and licensing constraints. Follow the platform-specific documentation under `MAX78000/docs/INSTALL.md` to prepare the dataset locally or on a training server.
+The experiments use the 20BN-Jester v1 gesture dataset. The raw dataset is not included in this repository because of size and licensing constraints. Follow the platform-specific documentation (`MAX78000/docs/INSTALL.md` or `STM32U5/docs/INSTALL.md`) to prepare the dataset locally or on a training server.
 
 ## Large Files and External Dependencies
 
