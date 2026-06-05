@@ -12,12 +12,20 @@ Current contents:
   - Host-side C reference for the intended streaming inference loop.
 - `deploy/host_send_jester.py`
   - UART host tool for feeding Jester validation clips to the board.
-- `docs/day13_checklist.md`
-  - STM32U5 deployment and validation checklist.
+- `docs/INSTALL.md`
+  - HPC environment, venvs, toolchain, and dataset setup.
+- `docs/TRAINING.md`
+  - Three-stage TAKD pipeline (Super Teacher → TA → Path-C student) + quantization.
+- `docs/EARLY_EXIT.md`
+  - Host-side early-exit strategies (S1/S3) and selected operating points.
 - `docs/WORKFLOW.md`
   - Compact end-to-end summary of the STM32U5 training-to-deployment flow derived from the project plan.
 - `docs/tsm_probe_results.md`
   - Probe report used to justify the streaming deployment path.
+- `docs/day13_checklist.md`
+  - STM32U5 deployment and validation checklist.
+- `docs/final_report_skeleton.md`
+  - Project final-report skeleton.
 - `models/selected_deployable/`
   - Final chosen deployable TFLite models and generated ST Edge AI network sources.
 - `results/`
