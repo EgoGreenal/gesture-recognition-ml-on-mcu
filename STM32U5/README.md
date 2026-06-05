@@ -47,8 +47,8 @@ Current contents:
   - Probe report used to justify the streaming deployment path.
 - `docs/day13_checklist.md`
   - STM32U5 deployment and validation checklist.
-- `docs/final_report_skeleton.md`
-  - Project final-report skeleton.
+- `docs/final_report.md`
+  - Project final report.
 - `models/selected_deployable/`
   - Final chosen deployable TFLite models and generated ST Edge AI network sources.
 - `results/`

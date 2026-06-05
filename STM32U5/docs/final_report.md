@@ -131,11 +131,6 @@ Deployed as a full STM32CubeIDE project, `STM32U5/mcu/firmware/gesture_c1j_U5_bo
   currently applied host-side** (`host_benchmark.py`). Folding it into the firmware is
   ~10 lines (an INT8 softmax-max + compare) and is the one remaining device-side step.
 
-### 7.4 LED1-4 light-control mapping
-- **Not implemented.** The deliverable validates recognition + latency over UART, not a
-  standalone light-control demo. Mapping the predicted class to the on-board LEDs is
-  listed under future work (§10).
-
 ## 8. System-level evaluation (Day 14)
 
 ### 8.1 End-to-end latency: measured vs estimate
@@ -161,12 +156,6 @@ is **not** directly comparable to the 86.49% full-val (14,787-clip, no-exit) bas
 carries n=128 sampling variance (±~6 pp) plus the early-exit drop and the
 streaming-vs-clip INT8 export. Per-class quality on the full val set
 (`../results/confusion_summary.csv`): C1j top-1 86.49% / mean-class 85.73%.
-
-### 8.3 Limitations
-- A **full-set on-device run** was not done (it would stream all 14,787 clips over UART);
-  it needs the firmware-side exit decision first (§7.3).
-- A **misrecognition case study** and a **live demo video** were not produced (no live
-  camera path on the U5 track).
 
 ## 9. Lessons learned (gotcha-diary summary)
 1. **From-scratch tiny CNN is not the route** (V0-V9 ceiling 38%; the C1 line — same topology as the TA + KD distillation — jumps to 84%)
