@@ -4,6 +4,11 @@ This directory collects the STM32U5-specific deployment material for the gesture
 
 Current contents:
 
+- `training/`
+  - Full TAKD training pipeline — `core/` (data loaders, Teacher/TA/Path-C student model
+    definitions, KD losses, training/fine-tune/QAT/INT8-export, TSM streaming probe,
+    eval/analysis) and `server_scripts/` (HPC setup + SLURM jobs). See
+    [docs/TRAINING.md](docs/TRAINING.md) and [docs/SERVER_TRAINING.md](docs/SERVER_TRAINING.md).
 - `mcu/firmware/gesture_c1j_U5_board/`
   - **Full STM32CubeIDE project (firmware `C1j-ai-v2`)** that runs the deployed C1j
     streaming INT8 model on the board (`ai_streaming_step`, single frame + TSM cache),
