@@ -1,6 +1,6 @@
 # Gesture Recognition on MCUs
 
-This repository contains a final course project for real-time hand gesture recognition on resource-constrained microcontrollers. The current complete implementation targets the Analog Devices MAX78000, and a placeholder is provided for an STM32U5 implementation that will be added by other contributors.
+This repository contains a final course project for real-time hand gesture recognition on resource-constrained microcontrollers. The current complete implementation targets the Analog Devices MAX78000, and the repository now also includes an STM32U5 deployment workspace with firmware entry code, host-side tooling, and bring-up documentation.
 
 The project studies the full embedded ML pipeline:
 
@@ -33,6 +33,10 @@ gesture-recognition-ml-on-mcu/
     training/
   STM32U5/
     README.md
+    deploy/
+    docs/
+    firmware/
+    workspace/
 ```
 
 ## MAX78000 Implementation
@@ -62,7 +66,22 @@ MAX78000/README.md
 
 ## STM32U5 Implementation
 
-The `STM32U5/` directory is intentionally a scaffold. Other contributors will add the STM32U5-specific training, quantization, deployment, and firmware material there.
+The `STM32U5/` directory now contains the STM32U5 deployment-side project material:
+
+- `STM32U5/firmware/`
+  - STM32U5 firmware entry code (`main.c`) prepared for board-side integration.
+- `STM32U5/deploy/`
+  - Host-side UART tooling and deployment-oriented reference code.
+- `STM32U5/docs/`
+  - Bring-up and deployment checklist for the STM32U5 board workflow.
+- `STM32U5/workspace/`
+  - Reserved workspace folders for ST Edge AI / STM32CubeIDE generated outputs.
+
+Start from:
+
+```text
+STM32U5/README.md
+```
 
 ## Dataset
 
