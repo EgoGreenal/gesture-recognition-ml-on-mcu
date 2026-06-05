@@ -11,6 +11,11 @@ The project studies the full embedded ML pipeline:
 - Streaming live camera frames and predictions to a host-side realtime demo.
 - Evaluating accuracy, model size, MMACs, inference time, and early-exit tradeoffs.
 
+## Course Project Group Members
+Yizhou Xu, Junkai Zhang
+
+ETH Zürich
+
 ## Repository Layout
 
 ```text
